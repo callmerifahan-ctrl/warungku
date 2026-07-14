@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>WarungKu</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+    <div class="container">
+
+        <h1>🛒 WarungKu</h1>
+
+        <div class="form-box">
+
+            <input type="text"
+                   id="itemName"
+                   placeholder="Nama Barang">
+
+            <input type="number"
+                   id="itemStock"
+                   placeholder="Jumlah Stok">
+
+            <button 
+                id="addButton"
+                onclick="addItem()">
+                
+                Tambah Barang
+                
+            </button>
+
+        </div>
+
+        <div class="list-box">
+
+            <h2>📦 Daftar Barang</h2>
+
+                <p id="totalItems">
+                    Total Barang : 0
+                </p>          
+
+            <ul id="itemList"></ul>
+
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
