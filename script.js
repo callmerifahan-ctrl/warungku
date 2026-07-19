@@ -15,15 +15,40 @@ function loadData() {
 
 function renderItems() {
 
+    const keyword =
+    document.getElementById("searchInput")
+        .value
+        .toLowerCase();
+    
     const itemList = document.getElementById("itemList");
 
     itemList.innerHTML = "";
 
     items.forEach((item, index) => {
 
+        if (!item.name.toLowerCase().includes(keyword)) {
+
+            return;
+
+        }
+
         const li = document.createElement("li");
 
-        li.textContent = `${item.name} - ${item.stock}`;
+        if (item.stock <= 5) {
+
+            li.innerHTML = `
+                ${item.name} - ${item.stock}
+                <span class="low-stock">
+                    ⚠️ Stok Menipis
+                </span>
+            `;
+
+        } else {
+
+            li.textContent =
+                `${item.name} - ${item.stock}`;
+
+        }
 
         createButtons(li, index);
 
@@ -83,7 +108,7 @@ function updateTotal() {
     const totalItems = document.getElementById("totalItems");
 
     totalItems.textContent =
-        `Total Barang : ${itemList.children.length}`;
+`     Total Barang : ${items.length}`;
 
 }
 
@@ -146,3 +171,10 @@ document.getElementById("itemStock").addEventListener("keydown", (event) => {
 
 loadData();
 renderItems();
+
+document.getElementById("searchInput")
+.addEventListener("input", () => {
+
+    renderItems();
+
+});

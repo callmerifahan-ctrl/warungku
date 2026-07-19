@@ -36,3 +36,14 @@
 - Data masih bersifat sementara (belum menggunakan Local Storage).
 - Tampilan saat ini dioptimalkan untuk desktop.
 - Siap memasuki tahap Closed Beta Testing.
+
+## Beta v0.2 - 19 Juli 2026
+
+### Added
+- Local Storage
+- Data tetap tersimpan setelah refresh
+- Refactor manajemen data menggunakan array
+
+### Improved
+- Fitur tambah, edit, dan hapus lebih stabil
+- Struktur JavaScript lebih rapi
