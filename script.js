@@ -1,60 +1,89 @@
-let editingItem = null;
+let items = [];
+let editingIndex = -1;
 
-function addItem(){
+function saveData() {
+    localStorage.setItem("warungkuItems", JSON.stringify(items));
+}
 
-    const itemName =
-        document.getElementById("itemName").value;
+function loadData() {
+    const data = localStorage.getItem("warungkuItems");
 
-    const itemStock =
-        document.getElementById("itemStock").value;
-
-    const itemList =
-        document.getElementById("itemList");
-
-        if (itemName === "") {
-
-        alert("Nama barang wajib diisi!");
-
-        return;
-
-        }
-
-        if (itemStock === "") {
-
-        alert("Stok barang wajib diisi!");
-
-        return;
-
+    if (data) {
+        items = JSON.parse(data);
     }
+}
 
-        if (editingItem !== null) {
+function renderItems() {
 
-        editingItem.textContent = `${itemName} - ${itemStock}`;
+    const itemList = document.getElementById("itemList");
 
-        createButtons(editingItem);
-        
-        document.getElementById("addButton").textContent =
-            "Tambah Barang";
+    itemList.innerHTML = "";
 
-            editingItem = null;
+    items.forEach((item, index) => {
 
-            clearInput();
+        const li = document.createElement("li");
 
-        return;
+        li.textContent = `${item.name} - ${item.stock}`;
 
-        }
+        createButtons(li, index);
 
-    const li = document.createElement("li");
+        itemList.appendChild(li);
 
-    li.textContent = `${itemName} - ${itemStock}`;
-
-    createButtons(li);
-    
-    itemList.appendChild(li);
+    });
 
     updateTotal();
 
+}
+
+function addItem() {
+
+    const itemName = document.getElementById("itemName").value.trim();
+
+    const itemStock = parseInt(document.getElementById("itemStock").value);
+
+    if (itemName === "") {
+        alert("Nama barang wajib diisi!");
+        return;
+    }
+
+    if (isNaN(itemStock)) {
+        alert("Stok barang wajib diisi!");
+        return;
+    }
+
+    if (editingIndex === -1) {
+
+        items.push({
+            name: itemName,
+            stock: itemStock
+        });
+
+    } else {
+
+        items[editingIndex] = {
+            name: itemName,
+            stock: itemStock
+        };
+
+        editingIndex = -1;
+
+        document.getElementById("addButton").textContent =
+            "Tambah Barang";
+    }
+
+    saveData();
+    renderItems();
     clearInput();
+}
+
+function updateTotal() {
+
+    const itemList = document.getElementById("itemList");
+
+    const totalItems = document.getElementById("totalItems");
+
+    totalItems.textContent =
+        `Total Barang : ${itemList.children.length}`;
 
 }
 
@@ -64,21 +93,21 @@ function clearInput() {
     document.getElementById("itemStock").value = "";
 
     document.getElementById("itemName").focus();
-   
-    document.getElementById("itemName").select();
 
 }
 
-function createButtons(li) {
+function createButtons(li, index) {
 
     const deleteButton = document.createElement("button");
     deleteButton.textContent = "🗑";
 
     deleteButton.addEventListener("click", () => {
 
-        li.remove();
+        items.splice(index, 1);
 
-        updateTotal();
+        saveData();
+
+        renderItems();
 
     });
 
@@ -87,35 +116,21 @@ function createButtons(li) {
 
     editButton.addEventListener("click", () => {
 
-        const text = li.textContent;
-
-        const data = text.split("-");
-
-        document.getElementById("itemName").value = data[0];
+        document.getElementById("itemName").value =
+            items[index].name;
 
         document.getElementById("itemStock").value =
-            parseInt(data[1]);
+            items[index].stock;
 
-        editingItem = li;
+        editingIndex = index;
+
         document.getElementById("addButton").textContent =
             "💾 Simpan Perubahan";
 
     });
 
     li.appendChild(deleteButton);
-
     li.appendChild(editButton);
-
-}
-
-function updateTotal(){
-
-    const itemList = document.getElementById("itemList");
-
-    const totalItems = document.getElementById("totalItems");
-
-    totalItems.textContent =
-        `Total Barang : ${itemList.children.length}`;
 
 }
 
@@ -128,3 +143,6 @@ document.getElementById("itemStock").addEventListener("keydown", (event) => {
     }
 
 });
+
+loadData();
+renderItems();
