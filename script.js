@@ -1,5 +1,6 @@
 let items = [];
 let editingIndex = -1;
+let totalStok = 0;
 
 function saveData() {
     localStorage.setItem("warungkuItems", JSON.stringify(items));
@@ -56,6 +57,7 @@ function renderItems() {
 
     });
 
+    updateDashboard();
     updateTotal();
 
 }
@@ -112,6 +114,69 @@ function updateTotal() {
 
 }
 
+function updateDashboard() {
+
+    // Total Barang
+
+        const totalBarang =
+        document.getElementById("dashboardTotalBarang");
+
+    totalBarang.textContent = items.length;
+
+    // Total Stok
+
+        const totalStok =
+        document.getElementById("dashboardTotalStok");
+
+        let jumlahStok = 0;
+
+            items.forEach((item) => {
+
+                jumlahStok += item.stock;
+
+            });
+
+        totalStok.textContent = jumlahStok;
+
+    // Stok Menipis
+        
+        const stokMenipisElement =
+        document.getElementById("dashboardStokMenipis");
+
+            let jumlahStokMenipis = 0;
+
+                items.forEach((item) => {
+
+                    if (item.stock <= 5) {
+
+                        jumlahStokMenipis++;
+                    
+                    }
+
+                });
+
+            stokMenipisElement.textContent = jumlahStokMenipis;
+
+    // Barang Habis
+        
+        const barangHabisElement =
+        document.getElementById("dashboardBarangHabis");
+
+            let jumlahBarangHabis = 0;
+
+                items.forEach((item) => {
+
+                    if (item.stock === 0) {
+
+                        jumlahBarangHabis++;
+                    
+                    }
+
+                });
+
+            barangHabisElement.textContent = jumlahBarangHabis;
+}
+
 function clearInput() {
 
     document.getElementById("itemName").value = "";
@@ -159,6 +224,63 @@ function createButtons(li, index) {
 
 }
 
+function bukaStokMenipis() {
+
+    const daftarBarang = items.filter((item) => {
+
+       return item.stock <= 5;
+
+    });
+
+    console.log(daftarBarang);
+
+    tampilkanDetailDashboard(
+        "⚠️ Barang Stok Menipis",
+
+        daftarBarang
+        
+    );
+
+}
+
+function bukaBarangHabis() {
+
+    tampilkanDetailDashboard("❌ Barang Habis");
+
+}
+
+function tampilkanDetailDashboard(
+    judul,
+    daftarBarang
+) {
+
+     const detail =
+    document.getElementById("dashboardDetail");
+
+    const title =
+    document.getElementById("dashboardDetailTitle");
+
+    const list =
+    document.getElementById("dashboardDetailList");
+
+    detail.style.display = "block";
+
+    title.textContent = judul;
+
+    list.innerHTML = "";
+
+        daftarBarang.forEach((item) => {
+
+        const li = document.createElement("li");
+
+        li.textContent = `${item.name} - ${item.stock}`;
+
+        list.appendChild(li);
+
+        });
+
+}
+
 document.getElementById("itemStock").addEventListener("keydown", (event) => {
 
     if (event.key === "Enter") {
@@ -178,3 +300,13 @@ document.getElementById("searchInput")
     renderItems();
 
 });
+
+// =========================
+// Event Dashboard
+// =========================
+
+const cardStokMenipis = document.getElementById("cardStokMenipis");
+const cardBarangHabis = document.getElementById("cardBarangHabis");
+
+cardStokMenipis.addEventListener("click", bukaStokMenipis);
+cardBarangHabis.addEventListener("click", bukaBarangHabis);

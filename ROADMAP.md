@@ -15,3 +15,16 @@
 ## v2.0
 - Login
 - Multi User
+
+# Beta v0.2
+
+## Sprint 1 - Dashboard
+
+- [ ] Layout Dashboard
+- [ ] Card Statistik
+- [ ] Total Barang
+- [ ] Total Stok
+- [ ] Barang Menipis
+- [ ] Barang Habis
+- [ ] Responsive
+- [ ] Testing
