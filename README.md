@@ -1,27 +1,27 @@
 # 🛒 WarungKu
 
-WarungKu adalah aplikasi sederhana untuk membantu mencatat stok barang di warung.
+Aplikasi inventori sederhana berbasis JavaScript untuk mengelola stok barang.
 
-## Fitur
+## ✨ Fitur
 
-- ✅ Tambah Barang
-- ✅ Edit Barang
-- ✅ Hapus Barang
-- ✅ Total Barang
-- ✅ Validasi Input
-- ✅ Enter Keyboard
-- ✅ Auto Focus
+- ✅ Menambah barang
+- ✅ Mengedit barang
+- ✅ Menghapus barang
+- ✅ Pencarian barang
+- ✅ Dashboard statistik
+- ✅ Status stok (Normal, Menipis, Habis)
+- ✅ Export CSV
+- ✅ Local Storage
 
-## Teknologi
+## 🛠️ Teknologi
 
 - HTML
 - CSS
 - JavaScript
+- LocalStorage API
 
-## Status
+## 🚀 Cara Menjalankan
 
-🚧 Beta Development
-
-## Tujuan
-
-Project ini dibuat sebagai latihan JavaScript sekaligus untuk membantu pencatatan stok warung agar lebih praktis.
+1. Download atau clone repository.
+2. Buka `index.html` di browser.
+3. Mulai kelola inventori.
