@@ -1,6 +1,5 @@
 let items = [];
 let editingIndex = -1;
-let totalStok = 0;
 
 function saveData() {
     localStorage.setItem("warungkuItems", JSON.stringify(items));
@@ -104,8 +103,6 @@ function addItem() {
 }
 
 function updateTotal() {
-
-    const itemList = document.getElementById("itemList");
 
     const totalItems = document.getElementById("totalItems");
 
@@ -245,7 +242,20 @@ function bukaStokMenipis() {
 
 function bukaBarangHabis() {
 
-    tampilkanDetailDashboard("❌ Barang Habis");
+    const daftarBarang = items.filter((stok) => {
+
+       return stok.stock === 0;
+
+    });
+
+    console.log(daftarBarang);
+
+    tampilkanDetailDashboard(
+        "❌ Barang Habis",
+
+        daftarBarang
+        
+    );
 
 }
 
