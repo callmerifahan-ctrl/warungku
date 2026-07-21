@@ -174,6 +174,43 @@ function updateDashboard() {
             barangHabisElement.textContent = jumlahBarangHabis;
 }
 
+function exportCSV() {
+
+    const csvData = items.map((item) => {
+
+        let status = "";
+
+        if (item.stock === 0) {
+            status = "Habis";
+        } else if (item.stock <= 5) {
+            status = "Menipis";
+        } else {
+            status = "Normal";
+        }
+
+        return `${item.name},${item.stock},${status}`;
+
+    });
+
+    const header = "Nama Barang,Stok,Status";
+    const csvContent = header + "\n" + csvData.join("\n");
+
+    const blob = new Blob([csvContent], {
+        type: "text/csv"
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "inventori.csv";
+
+    link.click();
+
+    URL.revokeObjectURL(url);
+
+}
+
 function clearInput() {
 
     document.getElementById("itemName").value = "";
@@ -317,6 +354,8 @@ document.getElementById("searchInput")
 
 const cardStokMenipis = document.getElementById("cardStokMenipis");
 const cardBarangHabis = document.getElementById("cardBarangHabis");
+const exportButton = document.getElementById("exportButton");
 
 cardStokMenipis.addEventListener("click", bukaStokMenipis);
 cardBarangHabis.addEventListener("click", bukaBarangHabis);
+exportButton.addEventListener("click", exportCSV);
