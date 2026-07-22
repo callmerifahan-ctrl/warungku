@@ -150,3 +150,29 @@ li{
     border-radius:12px;
 
 }
+
+@media (max-width:600px){
+
+    body{
+
+        padding:15px;
+
+    }
+
+    .container{
+
+        padding: 20px;
+    }    
+
+    .dashboard-card{
+
+        padding: 15px;
+
+    }
+
+    .dashboard-card h2{
+
+        font-size: 1.5rem;
+
+    }
+}

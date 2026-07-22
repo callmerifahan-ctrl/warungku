@@ -62,18 +62,8 @@
                    id="itemStock"
                    placeholder="Jumlah Stok">
 
-            <input
-                type="text"
-                id="searchInput"
-                placeholder="🔍 Cari barang..."
-            >
-
-            <button
-                id="addButton"
-                onclick="addItem()">
-
+            <button id="btnTambah">
                 Tambah Barang
-
             </button>
 
             <button
@@ -84,6 +74,27 @@
             </button>
 
         </div>
+
+        <div class="sort-box">
+
+            <label for="sortSelect">Urutkan:</label>
+
+            <select id="sortSelect">
+                <option value="default">Default</option>
+                <option value="nameAsc">Nama A-Z</option>
+                <option value="nameDesc">Nama Z-A</option>
+                <option value="stockAsc">Stok Tersedikit</option>
+                <option value="stockDesc">Stok Terbanyak</option>
+            </select>
+
+            <label for="searchInput">🔍 Cari Barang:</label>
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Cari nama barang..."
+                >
+
+        </div>        
 
         <div class="list-box">
 
