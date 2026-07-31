@@ -10,7 +10,56 @@ function loadData() {
 
     if (data) {
         items = JSON.parse(data);
+
+        migrateItems();
     }
+}
+
+function migrateItems() {
+
+    const prefixMap = {
+        Minuman: "MNM",
+        Makanan: "MKN",
+        Snack: "SNK"
+    };
+
+    const counters = {
+        Minuman: 0,
+        Makanan: 0,
+        Snack: 0
+    };
+
+    let changed = false;
+
+    items.forEach(item => {
+
+        counters[item.category]++;
+
+        if (!item.code) {
+
+            const prefixMap = {
+                Minuman: "MNM",
+                Makanan: "MKN",
+                Snack: "SNK",
+                Bumbu: "BMB",
+                Kebersihan: "KBS",
+                Perawatan: "PWT",
+                ATK: "ATK"
+            };
+            
+            item.code =
+                prefixMap[item.category] +
+                String(counters[item.category]).padStart(4, "0");
+
+            changed = true;
+        }
+
+    });
+
+    if (changed) {
+        saveData();
+    }
+
 }
 
 function renderItems() {
@@ -23,15 +72,20 @@ function renderItems() {
 
     itemList.innerHTML = "";
 
-    items.forEach((item, index) => {
+    items.forEach((item) => {
 
-        if (!item.name.toLowerCase().includes(keyword)) {
+        const cocokNama =
+            item.name.toLowerCase().includes(keyword);
+
+        const cocokKode =
+            item.code &&
+            item.code.toLowerCase().includes(keyword);
+
+        if (!cocokNama && !cocokKode) {
             return;
         }
 
         const li = createItem(item);
-
-        createButtons(li, item.id);
 
         itemList.appendChild(li);
 
@@ -40,9 +94,12 @@ function renderItems() {
     updateDashboard();
     updateTotal();
 
-}
 
-// ← renderItems selesai di sini
+    hitungMinuman();
+    hitungMakanan();
+    hitungSnack();
+
+}
 
 function createItem(item) {
 
@@ -51,7 +108,9 @@ function createItem(item) {
     if (item.stock <= 5) {
 
         li.innerHTML = `
-            ${item.name} - ${item.stock}
+            <strong>${item.name}</strong><br>
+            <small>Kode: ${item.code}</small><br>
+            Stok: ${item.stock}
             <span class="low-stock">
                 ⚠️ Stok Menipis
             </span>
@@ -59,19 +118,53 @@ function createItem(item) {
 
     } else {
 
-        li.textContent = `${item.name} - ${item.stock}`;
+        li.innerHTML = `
+            <strong>${item.name}</strong><br>
+            <small>Kode: ${item.code}</small><br>
+            Stok: ${item.stock}
+        `;
 
     }
+
+    createButtons(li, item.id);
 
     return li;
 
 }
 
+function generateItemCode(category) {
+    const prefixMap = {
+        "Minuman": "MNM",
+        "Makanan": "MKN",
+        "Snack": "SNK"
+    };
+
+    const prefix = prefixMap[category];
+
+    // Ambil semua kode pada kategori yang sama
+    const categoryCodes = items
+        .filter(item => item.category === category)
+        .map(item => {
+            const number = item.code?.replace(prefix, "");
+            return parseInt(number) || 0;
+        });
+
+    // Cari nomor terbesar
+    const lastNumber = categoryCodes.length > 0
+        ? Math.max(...categoryCodes)
+        : 0;
+
+    // Tambah 1
+    const newNumber = lastNumber + 1;
+
+    return prefix + String(newNumber).padStart(4, "0");
+}
 
 function addItem() {
 
     const itemName = document.getElementById("itemName").value.trim();
     const itemStock = parseInt(document.getElementById("itemStock").value);
+    const itemCategory = document.getElementById("category").value;
 
     if (itemName === "") {
         alert("Nama barang wajib diisi!");
@@ -85,18 +178,22 @@ function addItem() {
 
     if (editingIndex === -1) {
 
-        const item = {
+        const newItem = {
             id: Date.now(),
+            code: generateItemCode(itemCategory),
+            category: itemCategory,
             name: itemName,
             stock: itemStock
         };
 
-        items.push(item);
+        items.push(newItem);
 
     } else {
 
         items[editingIndex] = {
-            id: items[editingIndex].id, // ID jangan berubah
+            id: items[editingIndex].id,
+            code: items[editingIndex].code,
+            category: itemCategory,
             name: itemName,
             stock: itemStock
         };
@@ -116,72 +213,57 @@ function updateTotal() {
 
     const totalItems = document.getElementById("totalItems");
 
-    totalItems.textContent =
-`     Total Barang : ${items.length}`;
+    totalItems.textContent = `Total Barang : ${items.length}`;
 
 }
 
 function updateDashboard() {
 
     // Total Barang
-
-        const totalBarang =
+    const totalBarang =
         document.getElementById("dashboardTotalBarang");
 
     totalBarang.textContent = items.length;
 
     // Total Stok
-
-        const totalStok =
+    const totalStok =
         document.getElementById("dashboardTotalStok");
 
-        let jumlahStok = 0;
+    let jumlahStok = 0;
 
-            items.forEach((item) => {
+    items.forEach((item) => {
+        jumlahStok += item.stock;
+    });
 
-                jumlahStok += item.stock;
-
-            });
-
-        totalStok.textContent = jumlahStok;
+    totalStok.textContent = jumlahStok;
 
     // Stok Menipis
-        
-        const stokMenipisElement =
+    const stokMenipisElement =
         document.getElementById("dashboardStokMenipis");
 
-            let jumlahStokMenipis = 0;
+    let jumlahStokMenipis = 0;
 
-                items.forEach((item) => {
+    items.forEach((item) => {
+        if (item.stock <= 5) {
+            jumlahStokMenipis++;
+        }
+    });
 
-                    if (item.stock <= 5) {
-
-                        jumlahStokMenipis++;
-                    
-                    }
-
-                });
-
-            stokMenipisElement.textContent = jumlahStokMenipis;
+    stokMenipisElement.textContent = jumlahStokMenipis;
 
     // Barang Habis
-        
-        const barangHabisElement =
+    const barangHabisElement =
         document.getElementById("dashboardBarangHabis");
 
-            let jumlahBarangHabis = 0;
+    let jumlahBarangHabis = 0;
 
-                items.forEach((item) => {
+    items.forEach((item) => {
+        if (item.stock === 0) {
+            jumlahBarangHabis++;
+        }
+    });
 
-                    if (item.stock === 0) {
-
-                        jumlahBarangHabis++;
-                    
-                    }
-
-                });
-
-            barangHabisElement.textContent = jumlahBarangHabis;
+    barangHabisElement.textContent = jumlahBarangHabis;
 }
 
 function exportCSV() {
@@ -232,15 +314,15 @@ function clearInput() {
 
 function createButtons(li, id) {
 
-    const deleteButton = document.createElement("button");
+    const deleteBtn = document.createElement("button");
 
-    deleteButton.textContent = "🗑";
+    deleteBtn.textContent = "🗑";
 
-    deleteButton.addEventListener("click", () => {
+    deleteBtn.addEventListener("click", () => {
 
         if (confirm("Apakah kamu yakin ingin menghapus barang ini?")) {
 
-            const index = items.findIndex(item => item.id === id);
+            const index = items.findIndex(i => i.id === id);
 
             if (index === -1) {
                 alert("Barang tidak ditemukan!");
@@ -257,125 +339,127 @@ function createButtons(li, id) {
 
     });
 
-    const editButton = document.createElement("button");
-        editButton.textContent = "✏️";
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "✏️";
 
-        editButton.addEventListener("click", () => {
+    editBtn.addEventListener("click", () => {
 
-            const index = items.findIndex(item => item.id === id);
+        const index = items.findIndex(i => i.id === id);
 
-            if (index === -1) {
-                alert("Barang tidak ditemukan!");
-                return;
-            }
+        if (index === -1) {
+            alert("Barang tidak ditemukan!");
+            return;
+        }
 
-            document.getElementById("itemName").value =
-                items[index].name;
+        document.getElementById("itemName").value =
+            items[index].name;
 
-            document.getElementById("itemStock").value =
-                items[index].stock;
+        document.getElementById("itemStock").value =
+            items[index].stock;
 
-            editingIndex = index;
+        // dulu kategori gak ikut ke-restore pas edit
+        document.getElementById("category").value =
+            items[index].category;
 
-            document.getElementById("btnTambah").textContent =
-                "💾 Simpan Perubahan";
+        editingIndex = index;
 
-        });
+        document.getElementById("btnTambah").textContent =
+            "💾 Simpan Perubahan";
 
-    li.appendChild(deleteButton);
-    li.appendChild(editButton);
+    });
+
+    li.appendChild(deleteBtn);
+    li.appendChild(editBtn);
 
 }
 
 function bukaStokMenipis() {
 
     const daftarBarang = items.filter((item) => {
-
        return item.stock <= 5;
-
     });
-
-    console.log(daftarBarang);
 
     tampilkanDetailDashboard(
         "⚠️ Barang Stok Menipis",
-
         daftarBarang
-        
     );
 
 }
 
 function bukaBarangHabis() {
 
-    const daftarBarang = items.filter((stok) => {
-
-       return stok.stock === 0;
-
+    const daftarBarang = items.filter((item) => {
+       return item.stock === 0;
     });
-
-    console.log(daftarBarang);
 
     tampilkanDetailDashboard(
         "❌ Barang Habis",
-
         daftarBarang
-        
     );
 
 }
 
-function tampilkanDetailDashboard(
-    judul,
-    daftarBarang
-) {
+function tampilkanDetailDashboard(judul, daftarBarang) {
 
-     const detail =
-    document.getElementById("dashboardDetail");
-
-    const title =
-    document.getElementById("dashboardDetailTitle");
-
-    const list =
-    document.getElementById("dashboardDetailList");
+    const detail = document.getElementById("dashboardDetail");
+    const title = document.getElementById("dashboardDetailTitle");
+    const list = document.getElementById("dashboardDetailList");
 
     detail.style.display = "block";
-
     title.textContent = judul;
-
     list.innerHTML = "";
 
-        daftarBarang.forEach((item) => {
-
+    daftarBarang.forEach((item) => {
         const li = document.createElement("li");
-
         li.textContent = `${item.name} - ${item.stock}`;
-
         list.appendChild(li);
-
-        });
+    });
 
 }
 
 document.getElementById("itemStock").addEventListener("keydown", (event) => {
-
     if (event.key === "Enter") {
-
         addItem();
-
     }
-
 });
+
+function hitungMinuman() {
+
+    const minuman = items.filter((item) => {
+        return item.category === "Minuman";
+    });
+
+    const jumlahMinuman = minuman.length;
+
+    document.getElementById("jumlahMinuman").textContent = jumlahMinuman;// nanti ditampilkan ke HTML
+
+}
+
+function hitungMakanan() {
+
+    const makanan = items.filter((item) => {
+        return item.category === "Makanan";
+    });
+
+    const jumlahMakanan = makanan.length;
+
+    document.getElementById("jumlahMakanan").textContent = jumlahMakanan;
+
+}
+
+function hitungSnack() { 
+    const Snack = items.filter((item) => { 
+        return item.category === "Snack"; 
+    }); 
+    
+    const jumlahSnack = Snack.length; 
+    
+    document.getElementById("jumlahSnack").textContent = jumlahSnack;// nanti ditampilkan ke HTML 
+    
+}
 
 loadData();
 renderItems();
-
-document.getElementById("searchInput")
-.addEventListener("input", () => {
-
-    renderItems();
-
-});
 
 // =========================
 // Event Dashboard
@@ -392,40 +476,20 @@ cardStokMenipis.addEventListener("click", bukaStokMenipis);
 cardBarangHabis.addEventListener("click", bukaBarangHabis);
 exportButton.addEventListener("click", exportCSV);
 btnTambah.addEventListener("click", addItem);
+
+// (dulu ini didaftarkan 2x, sekarang cukup sekali)
 searchInput.addEventListener("input", renderItems);
 
 sortSelect.addEventListener("change", () => {
 
     if (sortSelect.value === "nameAsc") {
-
-        items.sort((a,b) => {
-            return a.name.localeCompare(b.name);
-        });
-
-    }
-
-    else if (sortSelect.value === "nameDesc") {
-
-        items.sort((a,b) => {
-            return b.name.localeCompare(a.name);
-        });
-
-    }
-
-    else if (sortSelect.value === "stockAsc") {
-
-        items.sort((a,b) => {
-            return a.stock - b.stock;
-        });
-
-    }
-
-    else if (sortSelect.value === "stockDesc") {
-
-        items.sort((a,b) => {
-            return b.stock - a.stock;
-        });
-
+        items.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortSelect.value === "nameDesc") {
+        items.sort((a, b) => b.name.localeCompare(a.name));
+    } else if (sortSelect.value === "stockAsc") {
+        items.sort((a, b) => a.stock - b.stock);
+    } else if (sortSelect.value === "stockDesc") {
+        items.sort((a, b) => b.stock - a.stock);
     }
 
     renderItems();

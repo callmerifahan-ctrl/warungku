@@ -62,6 +62,18 @@
                    id="itemStock"
                    placeholder="Jumlah Stok">
 
+        <label for="category">Kategori</label>
+
+            <select id="category">
+                <option value="Minuman">🥤 Minuman</option>
+                <option value="Makanan">🍜 Makanan</option>
+                <option value="Snack">🍪 Snack</option>
+                <option value="Bumbu">🧂 Bumbu</option>
+                <option value="Kebersihan">🧼 Kebersihan</option>
+                <option value="Perawatan">🧴 Perawatan</option>
+                <option value="ATK">✏️ ATK</option>
+            </select>
+
             <button id="btnTambah">
                 Tambah Barang
             </button>
@@ -106,6 +118,45 @@
 
             <ul id="itemList"></ul>
 
+        </div>
+
+    <div class="stats-countainer">
+
+        <div class="stat-card">
+            
+            <div class="card-header">
+                
+                <div class="icon">🥤</div>
+                    
+                    <p>Minuman</p>
+                
+                </div>
+            
+            </div>
+
+            <h2 id="jumlahMinuman">0</h2>
+        
+        </div>
+
+        <div class="stat-card">
+            <div class="card-header">
+                <div class="icon">🍜</div>
+                <p>Makanan</p>
+
+            </div>
+            
+            <h2 id="jumlahMakanan">0</h2>
+        
+        </div>
+
+        <div class="stat-card">
+            <div class="card-header">
+                <div class="icon">🍪</div>
+                <p>Snack</p>
+            </div>
+            
+            <h2 id="jumlahSnack">0</h2>
+        
         </div>
 
     </div>
