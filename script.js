@@ -1,5 +1,34 @@
+// ===================================
+// DATA 
+// ===================================
+
 let items = [];
 let editingIndex = -1;
+let activeCategory = "Semua";
+
+const PREFIX_MAP = {
+    Minuman: "MNM",
+    Makanan: "MKN",
+    Snack: "SNK",
+    Bumbu: "BMB",
+    Kebersihan: "KBS",
+    Perawatan: "PWT",
+    ATK: "ATK"
+};
+
+const CATEGORY_ICONS = {
+    Minuman: "🥤",
+    Makanan: "🍜",
+    Snack: "🍪",
+    Bumbu: "🧂",
+    Kebersihan: "🧼",
+    Perawatan: "🧴",
+    ATK: "✏️"
+};
+
+// ===================================
+// STORAGE
+// ===================================
 
 function saveData() {
     localStorage.setItem("warungkuItems", JSON.stringify(items));
@@ -17,17 +46,13 @@ function loadData() {
 
 function migrateItems() {
 
-    const prefixMap = {
-        Minuman: "MNM",
-        Makanan: "MKN",
-        Snack: "SNK"
-    };
+    const prefix = PREFIX_MAP[category];
 
-    const counters = {
-        Minuman: 0,
-        Makanan: 0,
-        Snack: 0
-    };
+    const counters = {};
+
+    Object.keys(PREFIX_MAP).forEach((key) => {
+        counters[key] = 0;
+    });
 
     let changed = false;
 
@@ -36,19 +61,9 @@ function migrateItems() {
         counters[item.category]++;
 
         if (!item.code) {
-
-            const prefixMap = {
-                Minuman: "MNM",
-                Makanan: "MKN",
-                Snack: "SNK",
-                Bumbu: "BMB",
-                Kebersihan: "KBS",
-                Perawatan: "PWT",
-                ATK: "ATK"
-            };
             
             item.code =
-                prefixMap[item.category] +
+                PREFIX_MAP[item.category] +
                 String(counters[item.category]).padStart(4, "0");
 
             changed = true;
@@ -72,7 +87,9 @@ function renderItems() {
 
     itemList.innerHTML = "";
 
-    items.forEach((item) => {
+    let filteredItems = items;
+
+    filteredItems.forEach((item) => {
 
         const cocokNama =
             item.name.toLowerCase().includes(keyword);
@@ -93,12 +110,7 @@ function renderItems() {
 
     updateDashboard();
     updateTotal();
-
-
-    hitungMinuman();
-    hitungMakanan();
-    hitungSnack();
-
+    renderCategoryCards();
 }
 
 function createItem(item) {
@@ -132,14 +144,13 @@ function createItem(item) {
 
 }
 
-function generateItemCode(category) {
-    const prefixMap = {
-        "Minuman": "MNM",
-        "Makanan": "MKN",
-        "Snack": "SNK"
-    };
+// ===================================
+// SKU
+// ===================================
 
-    const prefix = prefixMap[category];
+function generateItemCode(category) {
+
+    const prefix = PREFIX_MAP[category];
 
     // Ambil semua kode pada kategori yang sama
     const categoryCodes = items
@@ -159,6 +170,10 @@ function generateItemCode(category) {
 
     return prefix + String(newNumber).padStart(4, "0");
 }
+
+// ===================================
+// CRUD
+// ===================================
 
 function addItem() {
 
@@ -192,7 +207,7 @@ function addItem() {
 
         items[editingIndex] = {
             id: items[editingIndex].id,
-            code: items[editingIndex].code,
+            code: generateItemCode(itemCategory),
             category: itemCategory,
             name: itemName,
             stock: itemStock
@@ -216,6 +231,10 @@ function updateTotal() {
     totalItems.textContent = `Total Barang : ${items.length}`;
 
 }
+
+// ===================================
+// DASHBOARD
+// ===================================
 
 function updateDashboard() {
 
@@ -265,6 +284,43 @@ function updateDashboard() {
 
     barangHabisElement.textContent = jumlahBarangHabis;
 }
+
+function renderCategoryCards() {
+
+    const categoryContainer =
+        document.getElementById("categoryContainer");
+
+    categoryContainer.innerHTML = "";
+
+    Object.keys(PREFIX_MAP).forEach((kategori) => {
+
+        const jumlah = getJumlahKategori(kategori);
+        const icon = CATEGORY_ICONS[kategori];
+
+       categoryContainer.innerHTML += `
+
+            <div class="stat-card">
+
+                <div class="card-header">
+
+                    <div class="icon">${icon}</div>
+
+                    <p>${kategori}</p>
+
+                </div>
+
+                <h2>${jumlah}</h2>
+
+            </div>
+        `;
+
+    });
+
+}
+
+// ===================================
+// EXPORT
+// ===================================
 
 function exportCSV() {
 
@@ -423,39 +479,22 @@ document.getElementById("itemStock").addEventListener("keydown", (event) => {
     }
 });
 
-function hitungMinuman() {
+function getJumlahKategori(kategori) {
 
-    const minuman = items.filter((item) => {
-        return item.category === "Minuman";
+    const data = items.filter((item) => {
+        return item.category === kategori;
     });
 
-    const jumlahMinuman = minuman.length;
-
-    document.getElementById("jumlahMinuman").textContent = jumlahMinuman;// nanti ditampilkan ke HTML
+    return data.length;
 
 }
 
-function hitungMakanan() {
-
-    const makanan = items.filter((item) => {
-        return item.category === "Makanan";
+function hitungKategori(kategori, elementId) {
+    const data = items.filter((item) => {
+        return item.category === kategori;
     });
 
-    const jumlahMakanan = makanan.length;
-
-    document.getElementById("jumlahMakanan").textContent = jumlahMakanan;
-
-}
-
-function hitungSnack() { 
-    const Snack = items.filter((item) => { 
-        return item.category === "Snack"; 
-    }); 
-    
-    const jumlahSnack = Snack.length; 
-    
-    document.getElementById("jumlahSnack").textContent = jumlahSnack;// nanti ditampilkan ke HTML 
-    
+    document.getElementById(elementId).textContent = data.length;
 }
 
 loadData();
@@ -471,6 +510,10 @@ const exportButton = document.getElementById("exportButton");
 const btnTambah = document.getElementById("btnTambah");
 const sortSelect = document.getElementById("sortSelect");
 const searchInput = document.getElementById("searchInput");
+
+// ===================================
+// EVENTS
+// ===================================
 
 cardStokMenipis.addEventListener("click", bukaStokMenipis);
 cardBarangHabis.addEventListener("click", bukaBarangHabis);
