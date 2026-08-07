@@ -17,6 +17,7 @@ const PREFIX_MAP = {
 };
 
 const CATEGORY_ICONS = {
+    Semua:"📦",
     Minuman: "🥤",
     Makanan: "🍜",
     Snack: "🍪",
@@ -45,8 +46,6 @@ function loadData() {
 }
 
 function migrateItems() {
-
-    const prefix = PREFIX_MAP[category];
 
     const counters = {};
 
@@ -89,6 +88,16 @@ function renderItems() {
 
     let filteredItems = items;
 
+    if (activeCategory !== "Semua") {
+
+        filteredItems = items.filter((item) => {
+            
+            return item.category === activeCategory;
+        
+        });
+
+    }
+
     filteredItems.forEach((item) => {
 
         const cocokNama =
@@ -122,7 +131,7 @@ function createItem(item) {
         li.innerHTML = `
             <strong>${item.name}</strong><br>
             <small>Kode: ${item.code}</small><br>
-            Stok: ${item.stock}
+            
             <span class="low-stock">
                 ⚠️ Stok Menipis
             </span>
@@ -133,10 +142,60 @@ function createItem(item) {
         li.innerHTML = `
             <strong>${item.name}</strong><br>
             <small>Kode: ${item.code}</small><br>
-            Stok: ${item.stock}
+            
         `;
 
     }
+
+      li.innerHTML = `
+            <strong>${item.name}</strong><br>
+            <small>Kode: ${item.code}</small><br>
+        
+        `;
+      
+      const stockControls = document.createElement("div");
+          
+          stockControls.className = "stock-controls";
+          
+          const minusBtn = document.createElement("button");
+      minusBtn.textContent = "➖";
+  
+      minusBtn.addEventListener("click", () => {
+
+        if (item.stock === 0) {
+            return;
+        }
+
+        item.stock--;
+        
+        saveData();
+
+        renderItems();
+
+    });
+
+    const stockText = document.createElement("strong");
+    stockText.className = "stock-text";
+    stockText.textContent = item.stock;
+
+    const plusBtn = document.createElement("button");
+    plusBtn.textContent = "➕";
+
+    plusBtn.addEventListener("click", () => {
+
+        item.stock++;
+
+        saveData();
+
+        renderItems();
+
+    });
+          
+            stockControls.appendChild(minusBtn);
+            stockControls.appendChild(stockText);
+            stockControls.appendChild(plusBtn);
+          
+            li.appendChild(stockControls);
 
     createButtons(li, item.id);
 
@@ -287,32 +346,50 @@ function updateDashboard() {
 
 function renderCategoryCards() {
 
-    const categoryContainer =
+    const categoryContainer = 
         document.getElementById("categoryContainer");
 
     categoryContainer.innerHTML = "";
-
-    Object.keys(PREFIX_MAP).forEach((kategori) => {
+    
+    const categories = [
+        "Semua",
+        ...Object.keys(PREFIX_MAP)
+    ];
+    
+    categories.forEach((kategori) => {
 
         const jumlah = getJumlahKategori(kategori);
         const icon = CATEGORY_ICONS[kategori];
 
-       categoryContainer.innerHTML += `
+        const card = document.createElement("div");
 
-            <div class="stat-card">
+        card.className = "stat-card";
+        
+        card.innerHTML = `
+            <div class="card-header">
 
-                <div class="card-header">
+                <div class="icon">${icon}</div>
 
-                    <div class="icon">${icon}</div>
-
-                    <p>${kategori}</p>
-
-                </div>
-
-                <h2>${jumlah}</h2>
+                <p>${kategori}</p>
 
             </div>
+
+            <h2>${jumlah}</h2>
         `;
+
+        if (activeCategory === kategori) {
+            card.classList.add("active");
+        }
+
+        card.addEventListener("click", () => {
+            
+            activeCategory = kategori;
+
+            renderItems();
+
+        });
+
+        categoryContainer.appendChild(card);
 
     });
 
@@ -423,10 +500,10 @@ function createButtons(li, id) {
             "💾 Simpan Perubahan";
 
     });
-
+    
     li.appendChild(deleteBtn);
     li.appendChild(editBtn);
-
+   
 }
 
 function bukaStokMenipis() {
@@ -481,6 +558,10 @@ document.getElementById("itemStock").addEventListener("keydown", (event) => {
 
 function getJumlahKategori(kategori) {
 
+    if (kategori === "Semua") {
+      return items.length;
+    }
+    
     const data = items.filter((item) => {
         return item.category === kategori;
     });

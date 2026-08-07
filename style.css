@@ -189,4 +189,23 @@ li{
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0 4px 12px rgba(0,0,0,.08);
+
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+.stat-card:hover{
+    transform: translateY(-3px);
+}
+
+.stat-card.active{
+    background: #FFE5D4;
+    border: 2px solid #FFB997;
+}
+
+.stock-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
 }
