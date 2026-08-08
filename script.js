@@ -192,7 +192,78 @@ function createItem(item) {
 
     li.append(title, br1, code, br2,buyPrice,br3,sellPrice,br4);
 
-    createButtons(li, item.id);
+    // badge stok menipis
+    if (item.stock <= 5) {
+
+        const badge = document.createElement("span");
+        badge.className = "low-stock";
+        badge.textContent = "⚠️ Stok Menipis";
+
+        li.appendChild(badge);
+
+    }
+
+    // =========================
+    // STOCK CONTROLS
+    // =========================
+
+    const controlsRow = document.createElement("div");
+    controlsRow.className = "controls-row";
+
+    const stockControls = document.createElement("div");
+    stockControls.className = "stock-controls";
+
+    const minusBtn = document.createElement("button");
+    minusBtn.textContent = "➖";
+
+    minusBtn.addEventListener("click", () => {
+
+        if (item.stock === 0) return;
+
+        item.stock--;
+
+        saveData();
+        refreshUI();
+
+    });
+
+    const stockText = document.createElement("strong");
+    stockText.className = "stock-text";
+    stockText.textContent = item.stock;
+
+    const plusBtn = document.createElement("button");
+    plusBtn.textContent = "➕";
+
+    plusBtn.addEventListener("click", () => {
+
+        item.stock++;
+
+        saveData();
+        refreshUI();
+
+    });
+
+    stockControls.append(
+        minusBtn,
+        stockText,
+        plusBtn
+    );
+
+    // =========================
+    // ACTION BUTTONS
+    // =========================
+
+    const actionButtons = document.createElement("div");
+    actionButtons.className = "action-buttons";
+
+    createButtons(actionButtons, item.id);
+
+    controlsRow.append(
+        stockControls,
+        actionButtons
+    );
+
+    li.appendChild(controlsRow);
 
     return li;
 
@@ -433,18 +504,19 @@ function updateDashboard() {
 
 function renderCategoryCards() {
 
-    const categoryContainer = 
-        document.getElementById("categoryContainer");
+    categoryContainer.replaceChildren();
 
-    categoryContainer.innerHTML = "";
+    const categories = [
+        "Semua",
+        ...Object.keys(PREFIX_MAP)
+    ];
 
-    Object.keys(PREFIX_MAP).forEach((kategori) => {
+    categories.forEach((kategori) => {
 
         const jumlah = getJumlahKategori(kategori);
         const icon = CATEGORY_ICONS[kategori];
 
         const card = document.createElement("div");
-
         card.className = "stat-card";
 
         card.innerHTML = `
@@ -455,6 +527,20 @@ function renderCategoryCards() {
 
             <h2>${jumlah}</h2>
         `;
+
+        if (activeCategory === kategori) {
+            card.classList.add("active");
+        }
+
+        card.addEventListener("click", () => {
+
+            activeCategory = kategori;
+
+            renderItems();
+
+        });
+
+        categoryContainer.appendChild(card);
 
     });
 
@@ -567,6 +653,7 @@ function createButtons(actionButtons, id) {
 
     actionButtons.appendChild(deleteBtn);
     actionButtons.appendChild(editBtn);
+
 
 }
 

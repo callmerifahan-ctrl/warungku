@@ -59,3 +59,15 @@
 ### Improved
 - Struktur createItem() lebih rapi.
 - Memisahkan informasi statis dan komponen interaktif.
+
+## [Unreleased]
+
+### Added
+- Harga Modal untuk setiap barang
+- Harga Jual untuk setiap barang
+- Migrasi otomatis data lama
+- Tampilan harga pada daftar barang
+- Perbaikan stock controls (+/-)
+
+### Changed
+- Edit barang sekarang dapat mengubah harga modal dan harga jual.

@@ -286,3 +286,81 @@ li{
     padding: 20px;
     box-shadow: 0 4px 12px rgba(0,0,0,.08);
 }
+
+/* =========================
+   Stock Controls
+========================= */
+
+.controls-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:15px;
+    gap:15px;
+}
+
+.stock-controls{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.stock-controls button{
+    width:36px;
+    height:36px;
+
+    padding:0;
+
+    border:none;
+    border-radius:10px;
+
+    background:#D67A67;
+    color:#D67A67;
+
+    font-size:18px;
+    font-weight:bold;
+
+    cursor:pointer;
+    transition:.2s;
+}
+
+.stock-controls button:hover{
+    background:#D67A67;
+    transform:scale(1.05);
+}
+
+.stock-text{
+    min-width:35px;
+    text-align:center;
+    font-size:18px;
+    font-weight:600;
+}
+
+/* =========================
+   Action Buttons
+========================= */
+
+.action-buttons{
+    display:flex;
+    gap:8px;
+}
+
+.action-buttons button{
+    width:40px;
+    height:40px;
+
+    padding:0;
+
+    border:none;
+    border-radius:10px;
+
+    background:#D67A67;
+    color:white;
+
+    cursor:pointer;
+    transition:.2s;
+}
+
+.action-buttons button:hover{
+    transform:translateY(-2px);
+}
