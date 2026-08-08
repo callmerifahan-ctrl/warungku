@@ -62,28 +62,39 @@
                    id="itemStock"
                    placeholder="Jumlah Stok">
 
-        <label for="category">Kategori</label>
+            <label for="buyPrice">Harga Modal</label>
 
-            <select id="category">
-                <option value="Minuman">🥤 Minuman</option>
-                <option value="Makanan">🍜 Makanan</option>
-                <option value="Snack">🍪 Snack</option>
-                <option value="Bumbu">🧂 Bumbu</option>
-                <option value="Kebersihan">🧼 Kebersihan</option>
-                <option value="Perawatan">🧴 Perawatan</option>
-                <option value="ATK">✏️ ATK</option>
-            </select>
+                <input
+                    type="number"
+                    id="buyPrice"
+                    placeholder="Harga Modal">
 
-            <button id="btnTambah">
-                Tambah Barang
-            </button>
+                <label for="sellPrice">Harga Jual</label>
 
-            <button
-                id="exportButton">
+                <input
+                    type="number"
+                    id="sellPrice"
+                    placeholder="Harga Jual">
 
-                📄 Export CSV
+            <label for="category">Kategori</label>
 
-            </button>
+                <select id="category">
+                    <option value="Minuman">🥤 Minuman</option>
+                    <option value="Makanan">🍜 Makanan</option>
+                    <option value="Snack">🍪 Snack</option>
+                    <option value="Bumbu">🧂 Bumbu</option>
+                    <option value="Kebersihan">🧼 Kebersihan</option>
+                    <option value="Perawatan">🧴 Perawatan</option>
+                    <option value="ATK">✏️ ATK</option>
+                </select>
+
+            <button id="btnTambah" class="btn btn-primary">
+                    Tambah Barang
+                </button>
+
+                <button id="exportButton" class="btn btn-secondary">
+                    📄 Export CSV
+                </button>
 
         </div>
 
@@ -125,6 +136,8 @@
         id="categoryContainer">
 
     </div>
+
+    <div id="toast" class="toast"></div>
 
     <script src="script.js"></script>
 

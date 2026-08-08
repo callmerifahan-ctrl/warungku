@@ -27,6 +27,42 @@ const CATEGORY_ICONS = {
     ATK: "✏️"
 };
 
+/* ==================================================
+   DOM ELEMENTS
+================================================== */
+
+const itemNameInput = document.getElementById("itemName");
+const itemStockInput = document.getElementById("itemStock");
+const categorySelect = document.getElementById("category");
+
+const btnTambah = document.getElementById("btnTambah");
+const exportButton = document.getElementById("exportButton");
+
+const searchInput = document.getElementById("searchInput");
+const sortSelect = document.getElementById("sortSelect");
+
+const itemList = document.getElementById("itemList");
+const totalItems = document.getElementById("totalItems");
+
+const dashboardTotalBarang = document.getElementById("dashboardTotalBarang");
+const dashboardTotalStok = document.getElementById("dashboardTotalStok");
+const dashboardStokMenipis = document.getElementById("dashboardStokMenipis");
+const dashboardBarangHabis = document.getElementById("dashboardBarangHabis");
+
+const dashboardDetail = document.getElementById("dashboardDetail");
+const dashboardDetailTitle = document.getElementById("dashboardDetailTitle");
+const dashboardDetailList = document.getElementById("dashboardDetailList");
+
+const cardStokMenipis = document.getElementById("cardStokMenipis");
+const cardBarangHabis = document.getElementById("cardBarangHabis");
+
+const categoryContainer = document.getElementById("categoryContainer");
+
+const toast = document.getElementById("toast");
+
+const buyPriceInput = document.getElementById("buyPrice");
+const sellPriceInput = document.getElementById("sellPrice");
+
 // ===================================
 // STORAGE
 // ===================================
@@ -57,14 +93,13 @@ function migrateItems() {
 
     items.forEach(item => {
 
-        counters[item.category]++;
+        if (item.buyPrice === undefined) {
+            item.buyPrice = 0;
+            changed = true;
+        }
 
-        if (!item.code) {
-            
-            item.code =
-                PREFIX_MAP[item.category] +
-                String(counters[item.category]).padStart(4, "0");
-
+        if (item.sellPrice === undefined) {
+            item.sellPrice = 0;
             changed = true;
         }
 
@@ -78,13 +113,12 @@ function migrateItems() {
 
 function renderItems() {
 
-    const keyword = document.getElementById("searchInput")
-        .value
-        .toLowerCase();
+    const keyword =
+    searchInput.value.toLowerCase();
 
-    const itemList = document.getElementById("itemList");
+    itemList.replaceChildren();
 
-    itemList.innerHTML = "";
+    
 
     let filteredItems = items;
 
@@ -124,78 +158,39 @@ function renderItems() {
 
 function createItem(item) {
 
+    const itemHeader = document.createElement("div");
+    itemHeader.className = "item-header";
+
+    const itemName = document.createElement("strong");
+    itemName.textContent = item.name;
+
+    itemHeader.appendChild(itemName);
+
     const li = document.createElement("li");
 
-    if (item.stock <= 5) {
+    const title = document.createElement("strong");
+    title.textContent = item.name;
 
-        li.innerHTML = `
-            <strong>${item.name}</strong><br>
-            <small>Kode: ${item.code}</small><br>
-            
-            <span class="low-stock">
-                ⚠️ Stok Menipis
-            </span>
-        `;
+    const br1 = document.createElement("br");
 
-    } else {
+    const code = document.createElement("small");
+    code.textContent = `Kode: ${item.code}`;
 
-        li.innerHTML = `
-            <strong>${item.name}</strong><br>
-            <small>Kode: ${item.code}</small><br>
-            
-        `;
+    const br3 = document.createElement("br");
 
-    }
+    const buyPrice = document.createElement("small");
+    buyPrice.textContent =
+        `Modal : ${formatRupiah(item.buyPrice)}`;
 
-      li.innerHTML = `
-            <strong>${item.name}</strong><br>
-            <small>Kode: ${item.code}</small><br>
-        
-        `;
-      
-      const stockControls = document.createElement("div");
-          
-          stockControls.className = "stock-controls";
-          
-          const minusBtn = document.createElement("button");
-      minusBtn.textContent = "➖";
-  
-      minusBtn.addEventListener("click", () => {
+    const br4 = document.createElement("br");
 
-        if (item.stock === 0) {
-            return;
-        }
+    const sellPrice = document.createElement("small");
+    sellPrice.textContent =
+        `Jual : ${formatRupiah(item.sellPrice)}`;
 
-        item.stock--;
-        
-        saveData();
+    const br2 = document.createElement("br");
 
-        renderItems();
-
-    });
-
-    const stockText = document.createElement("strong");
-    stockText.className = "stock-text";
-    stockText.textContent = item.stock;
-
-    const plusBtn = document.createElement("button");
-    plusBtn.textContent = "➕";
-
-    plusBtn.addEventListener("click", () => {
-
-        item.stock++;
-
-        saveData();
-
-        renderItems();
-
-    });
-          
-            stockControls.appendChild(minusBtn);
-            stockControls.appendChild(stockText);
-            stockControls.appendChild(plusBtn);
-          
-            li.appendChild(stockControls);
+    li.append(title, br1, code, br2,buyPrice,br3,sellPrice,br4);
 
     createButtons(li, item.id);
 
@@ -230,24 +225,115 @@ function generateItemCode(category) {
     return prefix + String(newNumber).padStart(4, "0");
 }
 
+/* ==================================================
+   HELPERS
+================================================== */
+
+function refreshUI() {
+
+    renderItems();
+
+}
+
+function resetForm() {
+
+    itemNameInput.value = "";
+    itemStockInput.value = "";
+
+    buyPriceInput.value = "";
+    sellPriceInput.value = "";
+
+    categorySelect.value = "Minuman";
+
+    itemNameInput.focus();
+
+}
+
+function formatRupiah(angka) {
+
+    return "Rp " + angka.toLocaleString("id-ID");
+
+}
+
+function showToast(message, type = "success") {
+
+    toast.textContent = message;
+
+    toast.className = "toast";
+
+    if(type === "success"){
+        toast.style.background = "var(--success)";
+    }
+
+    if(type === "warning"){
+        toast.style.background = "var(--warning)";
+    }
+
+    if(type === "danger"){
+        toast.style.background = "var(--danger)";
+    }
+
+    toast.classList.add("show");
+
+    setTimeout(() => {
+
+        toast.classList.remove("show");
+
+    },2500);
+
+}
+
+function getItemById(id){
+
+    return items.find(item => item.id === id);
+
+}
+
 // ===================================
 // CRUD
 // ===================================
 
 function addItem() {
 
-    const itemName = document.getElementById("itemName").value.trim();
-    const itemStock = parseInt(document.getElementById("itemStock").value);
-    const itemCategory = document.getElementById("category").value;
+    const itemName =
+    itemNameInput.value.trim();
+
+    const itemStock =
+        parseInt(itemStockInput.value);
+
+    const itemBuyPrice =
+        parseInt(buyPriceInput.value);
+
+    const itemSellPrice =
+        parseInt(sellPriceInput.value);
+
+    const itemCategory =
+        categorySelect.value;
 
     if (itemName === "") {
-        alert("Nama barang wajib diisi!");
+        showToast("Nama barang wajib diisi!");
         return;
     }
 
     if (isNaN(itemStock)) {
-        alert("Stok barang wajib diisi!");
+        showToast("Stok barang wajib diisi!");
         return;
+    }
+
+    if (isNaN(itemBuyPrice)) {
+
+        showToast("Harga beli wajib diisi!");
+
+        return;
+
+    }
+
+    if (isNaN(itemSellPrice)) {
+
+        showToast("Harga jual wajib diisi!");
+
+        return;
+
     }
 
     if (editingIndex === -1) {
@@ -257,7 +343,11 @@ function addItem() {
             code: generateItemCode(itemCategory),
             category: itemCategory,
             name: itemName,
-            stock: itemStock
+
+            stock: itemStock,
+
+            buyPrice: itemBuyPrice,
+            sellPrice: itemSellPrice
         };
 
         items.push(newItem);
@@ -266,28 +356,30 @@ function addItem() {
 
         items[editingIndex] = {
             id: items[editingIndex].id,
-            code: generateItemCode(itemCategory),
+            code: items[editingIndex].code,
             category: itemCategory,
             name: itemName,
-            stock: itemStock
+            stock: itemStock,
+            buyPrice: itemBuyPrice,
+            sellPrice: itemSellPrice
         };
 
         editingIndex = -1;
 
-        document.getElementById("btnTambah").textContent =
+        btnTambah.textContent =
             "Tambah Barang";
     }
 
     saveData();
-    renderItems();
-    clearInput();
+    refreshUI();
+    resetForm();
+    showToast("Barang Berhasil disimpan!");
 }
 
 function updateTotal() {
 
-    const totalItems = document.getElementById("totalItems");
-
-    totalItems.textContent = `Total Barang : ${items.length}`;
+    totalItems.textContent =
+    `Total Barang : ${items.length}`;
 
 }
 
@@ -298,14 +390,11 @@ function updateTotal() {
 function updateDashboard() {
 
     // Total Barang
-    const totalBarang =
-        document.getElementById("dashboardTotalBarang");
-
-    totalBarang.textContent = items.length;
+    dashboardTotalBarang.textContent =
+        items.length;
 
     // Total Stok
-    const totalStok =
-        document.getElementById("dashboardTotalStok");
+    dashboardTotalStok
 
     let jumlahStok = 0;
 
@@ -313,11 +402,10 @@ function updateDashboard() {
         jumlahStok += item.stock;
     });
 
-    totalStok.textContent = jumlahStok;
+    dashboardTotalStok.textContent = jumlahStok;
 
     // Stok Menipis
-    const stokMenipisElement =
-        document.getElementById("dashboardStokMenipis");
+    dashboardStokMenipis
 
     let jumlahStokMenipis = 0;
 
@@ -327,11 +415,10 @@ function updateDashboard() {
         }
     });
 
-    stokMenipisElement.textContent = jumlahStokMenipis;
+    dashboardStokMenipis.textContent = jumlahStokMenipis;
 
     // Barang Habis
-    const barangHabisElement =
-        document.getElementById("dashboardBarangHabis");
+    dashboardBarangHabis
 
     let jumlahBarangHabis = 0;
 
@@ -341,7 +428,7 @@ function updateDashboard() {
         }
     });
 
-    barangHabisElement.textContent = jumlahBarangHabis;
+    dashboardBarangHabis.textContent = jumlahBarangHabis;
 }
 
 function renderCategoryCards() {
@@ -350,13 +437,8 @@ function renderCategoryCards() {
         document.getElementById("categoryContainer");
 
     categoryContainer.innerHTML = "";
-    
-    const categories = [
-        "Semua",
-        ...Object.keys(PREFIX_MAP)
-    ];
-    
-    categories.forEach((kategori) => {
+
+    Object.keys(PREFIX_MAP).forEach((kategori) => {
 
         const jumlah = getJumlahKategori(kategori);
         const icon = CATEGORY_ICONS[kategori];
@@ -364,32 +446,15 @@ function renderCategoryCards() {
         const card = document.createElement("div");
 
         card.className = "stat-card";
-        
+
         card.innerHTML = `
             <div class="card-header">
-
                 <div class="icon">${icon}</div>
-
                 <p>${kategori}</p>
-
             </div>
 
             <h2>${jumlah}</h2>
         `;
-
-        if (activeCategory === kategori) {
-            card.classList.add("active");
-        }
-
-        card.addEventListener("click", () => {
-            
-            activeCategory = kategori;
-
-            renderItems();
-
-        });
-
-        categoryContainer.appendChild(card);
 
     });
 
@@ -436,16 +501,7 @@ function exportCSV() {
 
 }
 
-function clearInput() {
-
-    document.getElementById("itemName").value = "";
-    document.getElementById("itemStock").value = "";
-
-    document.getElementById("itemName").focus();
-
-}
-
-function createButtons(li, id) {
+function createButtons(actionButtons, id) {
 
     const deleteBtn = document.createElement("button");
 
@@ -458,7 +514,7 @@ function createButtons(li, id) {
             const index = items.findIndex(i => i.id === id);
 
             if (index === -1) {
-                alert("Barang tidak ditemukan!");
+                showToast("Barang tidak ditemukan!");
                 return;
             }
 
@@ -466,7 +522,9 @@ function createButtons(li, id) {
 
             saveData();
 
-            renderItems();
+            refreshUI();
+
+            showToast("Barang Berhasil dihapus!");
 
         }
 
@@ -480,30 +538,36 @@ function createButtons(li, id) {
         const index = items.findIndex(i => i.id === id);
 
         if (index === -1) {
-            alert("Barang tidak ditemukan!");
+            showToast("Barang tidak ditemukan!");
             return;
         }
 
-        document.getElementById("itemName").value =
+        itemNameInput.value =
             items[index].name;
 
-        document.getElementById("itemStock").value =
+        itemStockInput.value =
             items[index].stock;
 
+        buyPriceInput.value =
+        items[index].buyPrice;
+
+        sellPriceInput.value =
+            items[index].sellPrice;
+
         // dulu kategori gak ikut ke-restore pas edit
-        document.getElementById("category").value =
+        categorySelect.value =
             items[index].category;
 
         editingIndex = index;
 
-        document.getElementById("btnTambah").textContent =
+        btnTambah.textContent =
             "💾 Simpan Perubahan";
 
     });
-    
-    li.appendChild(deleteBtn);
-    li.appendChild(editBtn);
-   
+
+    actionButtons.appendChild(deleteBtn);
+    actionButtons.appendChild(editBtn);
+
 }
 
 function bukaStokMenipis() {
@@ -534,23 +598,21 @@ function bukaBarangHabis() {
 
 function tampilkanDetailDashboard(judul, daftarBarang) {
 
-    const detail = document.getElementById("dashboardDetail");
-    const title = document.getElementById("dashboardDetailTitle");
-    const list = document.getElementById("dashboardDetailList");
+    dashboardDetail.style.display = "block";
 
-    detail.style.display = "block";
-    title.textContent = judul;
-    list.innerHTML = "";
+    dashboardDetailTitle.textContent = judul;
+
+    dashboardDetailList.replaceChildren();
 
     daftarBarang.forEach((item) => {
         const li = document.createElement("li");
         li.textContent = `${item.name} - ${item.stock}`;
-        list.appendChild(li);
+        dashboardDetailList.appendChild(li);
     });
 
 }
 
-document.getElementById("itemStock").addEventListener("keydown", (event) => {
+itemStockInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
         addItem();
     }
@@ -578,44 +640,58 @@ function hitungKategori(kategori, elementId) {
     document.getElementById(elementId).textContent = data.length;
 }
 
-loadData();
-renderItems();
+/* ==================================================
+   EVENTS
+================================================== */
 
-// =========================
-// Event Dashboard
-// =========================
+function setupEventListeners() {
 
-const cardStokMenipis = document.getElementById("cardStokMenipis");
-const cardBarangHabis = document.getElementById("cardBarangHabis");
-const exportButton = document.getElementById("exportButton");
-const btnTambah = document.getElementById("btnTambah");
-const sortSelect = document.getElementById("sortSelect");
-const searchInput = document.getElementById("searchInput");
+    btnTambah.addEventListener("click", addItem);
 
-// ===================================
-// EVENTS
-// ===================================
+    searchInput.addEventListener("input", renderItems);
 
-cardStokMenipis.addEventListener("click", bukaStokMenipis);
-cardBarangHabis.addEventListener("click", bukaBarangHabis);
-exportButton.addEventListener("click", exportCSV);
-btnTambah.addEventListener("click", addItem);
+    sortSelect.addEventListener("change", () => {
 
-// (dulu ini didaftarkan 2x, sekarang cukup sekali)
-searchInput.addEventListener("input", renderItems);
+        if (sortSelect.value === "nameAsc") {
+            items.sort((a, b) => a.name.localeCompare(b.name));
+        } else if (sortSelect.value === "nameDesc") {
+            items.sort((a, b) => b.name.localeCompare(a.name));
+        } else if (sortSelect.value === "stockAsc") {
+            items.sort((a, b) => a.stock - b.stock);
+        } else if (sortSelect.value === "stockDesc") {
+            items.sort((a, b) => b.stock - a.stock);
+        }
 
-sortSelect.addEventListener("change", () => {
+        renderItems();
 
-    if (sortSelect.value === "nameAsc") {
-        items.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (sortSelect.value === "nameDesc") {
-        items.sort((a, b) => b.name.localeCompare(a.name));
-    } else if (sortSelect.value === "stockAsc") {
-        items.sort((a, b) => a.stock - b.stock);
-    } else if (sortSelect.value === "stockDesc") {
-        items.sort((a, b) => b.stock - a.stock);
-    }
+    });
 
-    renderItems();
+    cardStokMenipis.addEventListener("click", bukaStokMenipis);
+    
+    cardBarangHabis.addEventListener("click", bukaBarangHabis);
+    
+    exportButton.addEventListener("click", exportCSV);
+    
+    // dst...
 
-});
+}
+
+/* ==================================================
+   INIT
+================================================== */
+
+function init() {
+
+    loadData();
+
+    refreshUI();
+
+    setupEventListeners();
+
+}
+
+/* ==================================================
+   START APP
+================================================== */
+
+init();

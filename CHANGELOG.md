@@ -47,3 +47,15 @@
 ### Improved
 - Fitur tambah, edit, dan hapus lebih stabil
 - Struktur JavaScript lebih rapi
+
+## Sprint 4 - Quick Stock
+
+### Added
+- Tombol ➕ untuk menambah stok.
+- Tombol ➖ untuk mengurangi stok.
+- Mencegah stok menjadi negatif.
+- Tampilan stok dipindahkan ke Quick Stock Controls.
+
+### Improved
+- Struktur createItem() lebih rapi.
+- Memisahkan informasi statis dan komponen interaktif.

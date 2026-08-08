@@ -1,7 +1,51 @@
+/* =========================
+   WarungKu Design System
+========================= */
+
+:root{
+
+    /* Brand */
+    --primary:#D67A67;
+    --primary-hover:#C86855;
+
+    /* Background */
+    --background:#FFF8F5;
+    --surface:#FFFFFF;
+    --surface-soft:#FFF3EE;
+
+    /* Text */
+    --text:#333333;
+    --text-light:#777777;
+
+    /* Border */
+    --border:#E3E3E3;
+
+    /* Status */
+    --success:#27AE60;
+    --warning:#F39C12;
+    --danger:#E74C3C;
+    --info:#3498DB;
+
+    /* Radius */
+    --radius-sm:10px;
+    --radius-md:14px;
+    --radius-lg:20px;
+
+    /* Shadow */
+    --shadow:0 10px 30px rgba(0,0,0,.08);
+
+    /* Animation */
+    --transition:.25s ease;
+
+}
+
 body{
 
     font-family:Poppins,sans-serif;
-    background:#FFF8F5;
+    background:var(--background);
+
+    color:var(--text);
+
     margin:0;
     padding:40px;
 
@@ -10,18 +54,24 @@ body{
 .container{
 
     max-width:600px;
+
     margin:auto;
-    background:white;
+
+    background:var(--surface);
+
     padding:30px;
-    border-radius:20px;
-    box-shadow:0 10px 30px rgba(0,0,0,.08);
+
+    border-radius:var(--radius-lg);
+
+    box-shadow:var(--shadow);
 
 }
 
 h1{
 
     text-align:center;
-    color:#D67A67;
+
+    color:var(--primary);
 
 }
 
@@ -37,29 +87,80 @@ h1{
 input{
 
     padding:14px;
-    border:1px solid #ddd;
-    border-radius:12px;
+
+    border:1px solid var(--border);
+
+    border-radius:var(--radius-md);
+
     font-size:16px;
+
+    transition:var(--transition);
+
+}
+
+input:focus{
+
+    outline:none;
+
+    border-color:var(--primary);
+
+    box-shadow:0 0 0 4px rgba(214,122,103,.15);
 
 }
 
 button{
 
     padding:14px;
+
     border:none;
-    border-radius:12px;
-    background:#D67A67;
+
+    border-radius:var(--radius-md);
+
+    background:var(--primary);
+
     color:white;
+
     font-size:16px;
+
     cursor:pointer;
-    transition:.3s;
+
+    transition:var(--transition);
 
 }
 
 button:hover{
 
-    transform:translateY(-3px);
+    background:var(--primary-hover);
 
+    transform:translateY(-2px);
+
+}
+
+.btn{
+    padding:14px;
+    border:none;
+    border-radius:var(--radius-md);
+    cursor:pointer;
+    font-size:16px;
+    transition:var(--transition);
+}
+
+.btn-primary{
+    background:var(--primary);
+    color:white;
+}
+
+.btn-primary:hover{
+    background:var(--primary-hover);
+}
+
+.btn-secondary{
+    background:#6C757D;
+    color:white;
+}
+
+.btn-secondary:hover{
+    background:#5A6268;
 }
 
 .list-box{
@@ -77,28 +178,28 @@ ul{
 
 li{
 
-    background:#FFF3EE;
+    background:var(--surface-soft);
+
     padding:14px;
-    border-radius:12px;
+
+    border-radius:var(--radius-md);
+
     margin-bottom:12px;
+
     font-weight:500;
+
+    transition:var(--transition);
 
 }
 
 #searchInput{
 
     width:100%;
-
     padding:14px;
-
     margin:20px 0;
-
     border-radius:10px;
-
     border:1px solid #ddd;
-
     font-size:16px;
-
     box-sizing:border-box;
 
 }
@@ -115,7 +216,7 @@ li{
 }
 
 .dashboard-card{
-    background:#ffffff;
+    background:var(--surface);
     border-radius:15px;
     padding:20px;
     text-align:center;
@@ -138,16 +239,11 @@ li{
 }
 
 .dashboard-detail{
-
     display:none;
-
     background:#fff;
-
     margin-top:20px;
-
     padding:15px;
-
-    border-radius:12px;
+    border-radius:var(--radius);
 
 }
 
@@ -185,27 +281,8 @@ li{
 
 .stat-card{
     flex: 1;
-    background: white;
-    border-radius: 12px;
+    background: var(--card);
+    border-radius: var(--radius);
     padding: 20px;
     box-shadow: 0 4px 12px rgba(0,0,0,.08);
-
-    cursor: pointer;
-    transition: all .2s ease;
-}
-
-.stat-card:hover{
-    transform: translateY(-3px);
-}
-
-.stat-card.active{
-    background: #FFE5D4;
-    border: 2px solid #FFB997;
-}
-
-.stock-controls {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    align-items: center;
 }
