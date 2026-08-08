@@ -4,6 +4,7 @@
 
 let items = [];
 let cart = [];
+let transactions = [];
 
 // ===================================
 // STORAGE
@@ -17,7 +18,30 @@ function loadData() {
         items = JSON.parse(data);
     }
 
-    console.log(items);
+    const history =
+        localStorage.getItem("warungkuTransactions");
+
+    if (history) {
+        transactions = JSON.parse(history);
+    }
+
+}
+
+function generateTransactionCode() {
+
+    const number = transactions.length + 1;
+
+    return "TRX-" +
+        String(number).padStart(6, "0");
+
+}
+
+function saveTransactions() {
+
+    localStorage.setItem(
+        "warungkuTransactions",
+        JSON.stringify(transactions)
+    );
 
 }
 
@@ -227,7 +251,30 @@ function checkout() {
         JSON.stringify(items)
     );
 
+    const transaction = {
+
+        id: Date.now(),
+
+        transactionCode:
+            generateTransactionCode(),
+
+        date: new Date().toLocaleString("id-ID"),
+
+        items: [...cart],
+
+        total: cart.reduce((sum, item) => {
+
+            return sum + (item.price * item.qty);
+
+        }, 0)
+
+    };
+
     cart = [];
+    
+    transactions.push(transaction);
+
+    saveTransactions();
 
     renderCashierItems();
 
