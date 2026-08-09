@@ -262,13 +262,18 @@ function checkout() {
 
         items: [...cart],
 
-        total: cart.reduce((sum, item) => {
+        total: total,
 
-            return sum + (item.price * item.qty);
+        payment: payment,
 
-        }, 0)
+        change: change
 
     };
+    
+    paymentInput.value = "";
+
+    changeTotal.textContent =
+        formatRupiah(0);
 
     cart = [];
     
