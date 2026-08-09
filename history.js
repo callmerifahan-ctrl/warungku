@@ -4,6 +4,7 @@
 
 let transactions = [];
 
+
 // ===================================
 // STORAGE
 // ===================================
@@ -21,13 +22,45 @@ function loadTransactions() {
 
 }
 
+
 // ===================================
-// DOM
+// DOM ELEMENTS
 // ===================================
 
 const transactionList =
     document.getElementById("transactionList");
 
+const transactionModal =
+    document.getElementById("transactionModal");
+
+const receiptContent =
+    document.getElementById("receiptContent");
+
+const closeModal =
+    document.getElementById("closeModal");
+
+
+// ===================================
+// EVENT LISTENERS
+// ===================================
+
+function setupEventListeners() {
+
+    if (closeModal) {
+
+        closeModal.addEventListener(
+            "click",
+            hideModal
+        );
+
+    }
+
+}
+
+
+// ===================================
+// RENDER
+// ===================================
 
 function renderTransactions() {
 
@@ -44,24 +77,55 @@ function renderTransactions() {
 
 }
 
+function renderReceipt(transaction) {
+
+    receiptContent.replaceChildren();
+
+    const header =
+        createReceiptHeader(transaction);
+
+    receiptContent.appendChild(header);
+
+}
+
+
+// ===================================
+// CREATE ELEMENTS
+// ===================================
+
 function createTransactionCard(transaction) {
 
-    const card = document.createElement("div");
-    card.className = "transaction-card";
+    const card =
+        document.createElement("div");
 
-    const code = document.createElement("h2");
+    card.className =
+        "transaction-card";
+
+    card.addEventListener("click", () => {
+
+        openTransactionDetail(transaction);
+
+    });
+
+    const code =
+        document.createElement("h2");
 
     code.textContent =
         transaction.transactionCode;
-    
-    const date = document.createElement("h3");
-    date.textContent = transaction.date;
 
-    const list = document.createElement("ul");
-    
+    const date =
+        document.createElement("h3");
+
+    date.textContent =
+        transaction.date;
+
+    const list =
+        document.createElement("ul");
+
     transaction.items.forEach((item) => {
 
-        const li = document.createElement("li");
+        const li =
+            document.createElement("li");
 
         li.textContent =
             `${item.name} ×${item.qty} - ${formatRupiah(item.price * item.qty)}`;
@@ -70,7 +134,8 @@ function createTransactionCard(transaction) {
 
     });
 
-    const total = document.createElement("p");
+    const total =
+        document.createElement("p");
 
     total.textContent =
         `Total : ${formatRupiah(transaction.total)}`;
@@ -86,6 +151,62 @@ function createTransactionCard(transaction) {
 
 }
 
+function createReceiptHeader(transaction) {
+
+    const container =
+        document.createElement("div");
+
+    const code =
+        document.createElement("h2");
+
+    code.textContent =
+        transaction.transactionCode;
+
+    const date =
+        document.createElement("p");
+
+    date.textContent =
+        transaction.date;
+
+    container.append(
+        code,
+        date
+    );
+
+    return container;
+
+}
+
+
+// ===================================
+// MODAL
+// ===================================
+
+function openTransactionDetail(transaction) {
+
+    renderReceipt(transaction);
+
+    showModal();
+
+}
+
+function showModal() {
+
+    transactionModal.classList.remove("hidden");
+
+}
+
+function hideModal() {
+
+    transactionModal.classList.add("hidden");
+
+}
+
+
+// ===================================
+// UTILITIES
+// ===================================
+
 function formatRupiah(angka) {
 
     return "Rp " +
@@ -93,11 +214,18 @@ function formatRupiah(angka) {
 
 }
 
+
+// ===================================
+// INIT
+// ===================================
+
 function init() {
 
     loadTransactions();
 
     renderTransactions();
+
+    setupEventListeners();
 
 }
 
