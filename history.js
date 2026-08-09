@@ -81,10 +81,17 @@ function renderReceipt(transaction) {
 
     receiptContent.replaceChildren();
 
-    const header =
-        createReceiptHeader(transaction);
+    receiptContent.append(
 
-    receiptContent.appendChild(header);
+        createReceiptHeader(transaction),
+
+        createReceiptItems(transaction),
+
+        createReceiptSummary(transaction),
+
+        createReceiptFooter()
+
+    );
 
 }
 
@@ -174,6 +181,98 @@ function createReceiptHeader(transaction) {
     );
 
     return container;
+
+}
+
+function createReceiptItems(transaction) {
+
+    const container =
+        document.createElement("div");
+
+    transaction.items.forEach((item) => {
+
+        const row =
+            document.createElement("div");
+
+        const name =
+            document.createElement("p");
+
+        name.textContent =
+            item.name;
+
+        const qty =
+            document.createElement("p");
+
+        qty.textContent =
+            `${item.qty} × ${formatRupiah(item.price)}`;
+
+        const subtotal =
+            document.createElement("p");
+
+        subtotal.textContent =
+            formatRupiah(item.qty * item.price);
+
+        row.append(
+            name,
+            qty,
+            subtotal
+        );
+
+        container.appendChild(row);
+
+    });
+
+    return container;
+
+}
+
+function createReceiptSummary(transaction) {
+
+    const container =
+        document.createElement("div");
+
+    const total =
+        document.createElement("p");
+
+    total.textContent =
+        `Total : ${formatRupiah(transaction.total)}`;
+
+    const payment =
+        document.createElement("p");
+
+    payment.textContent =
+        `Bayar : ${formatRupiah(transaction.payment)}`;
+
+    const change =
+        document.createElement("p");
+
+    change.textContent =
+        `Kembali : ${formatRupiah(transaction.change)}`;
+
+    container.append(
+        total,
+        payment,
+        change
+    );
+
+    return container;
+
+}
+
+function createReceiptFooter() {
+
+    const footer =
+        document.createElement("div");
+
+    const thanks =
+        document.createElement("p");
+
+    thanks.textContent =
+        "Terima kasih 🙏";
+
+    footer.appendChild(thanks);
+
+    return footer;
 
 }
 

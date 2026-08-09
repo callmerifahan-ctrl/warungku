@@ -16,25 +16,19 @@
 
 <body>
 
-<div class="container">
+        <div class="container">
 
-    <h1>🛒 Kasir</h1>
+            <h1>🛒 Kasir</h1>
 
-    <div class="cashier-box">
+            <div class="cashier-box">
 
-        <h2>Daftar Barang</h2>
+            <h2>Daftar Barang</h2>
 
-        <div id="cashierItems">
+            <div id="cashierItems"></div>
 
         </div>
 
-    </div>
-
-    <div class="cart-box">
-
-        <h2>Daftar Barang</h2>
-
-            <div id="cashierItems"></div>
+        <div class="cart-box">
 
             <hr>
 
@@ -46,9 +40,22 @@
 
             <h3 id="cartTotal">Rp 0</h3>
 
-        <button id="checkoutButton">
-            💳 Bayar
-        </button>
+            <h2>Pembayaran</h2>
+
+            <input
+                id="paymentInput"
+                type="number"
+                placeholder="Masukkan uang pelanggan">
+
+            <h2>Kembalian</h2>
+
+            <h3 id="changeTotal">Rp 0</h3>
+
+            <button id="checkoutButton">
+                💳 Bayar
+            </button>
+
+        </div>        
 
     </div>
 
