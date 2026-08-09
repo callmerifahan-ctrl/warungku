@@ -370,7 +370,8 @@ function checkout() {
 
     renderCashierItems();
 
-    alert("Transaksi berhasil!");
+    window.location.href =
+    `receipt.html?id=${transaction.transactionCode}`;
 
 }
 

@@ -364,3 +364,287 @@ li{
 .action-buttons button:hover{
     transform:translateY(-2px);
 }
+
+/* ===================================
+   HISTORY
+=================================== */
+
+.history-card{
+
+    background:#fff;
+
+    border-radius:20px;
+
+    padding:25px;
+
+    margin-bottom:25px;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+
+}
+
+.history-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:15px;
+
+}
+
+.history-code{
+
+    font-size:26px;
+
+    font-weight:bold;
+
+    color:#d97c63;
+
+}
+
+.history-date{
+
+    color:#777;
+
+    margin-bottom:20px;
+
+}
+
+.history-items{
+
+    margin-left:20px;
+
+    margin-bottom:20px;
+
+}
+
+.history-total{
+
+    font-size:22px;
+
+    font-weight:bold;
+
+    color:#d97c63;
+
+}
+
+.history-buttons{
+
+    display:flex;
+
+    gap:12px;
+
+    margin-top:20px;
+
+}
+
+.history-buttons button{
+
+    border:none;
+
+    padding:10px 18px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    background:#d97c63;
+
+    color:white;
+
+    font-weight:bold;
+
+}
+
+.history-buttons button:hover{
+
+    opacity:.9;
+
+}
+
+#transactionContainer{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+    margin-top:30px;
+}
+
+.transaction-card{
+    background:#fff;
+    border-radius:18px;
+    padding:24px;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+    transition:.25s;
+}
+
+.transaction-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 15px 35px rgba(0,0,0,.12);
+}
+
+.transaction-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:16px;
+}
+
+.transaction-header h2{
+    color:#d77a61;
+    margin:0;
+}
+
+.transaction-header span{
+    color:#888;
+}
+
+.transaction-summary{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.transaction-summary h3{
+    margin:0;
+    font-size:28px;
+    color:#222;
+}
+
+.transaction-summary p{
+    color:#777;
+}
+
+.detail-btn{
+    margin-top:18px;
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:12px;
+    background:#d77a61;
+    color:#fff;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.detail-btn:hover{
+    opacity:.9;
+}
+
+/* ===================================
+   RECEIPT
+=================================== */
+
+.receipt-container{
+
+    max-width:380px;
+
+    margin:40px auto;
+
+    background:#fff;
+
+    padding:30px;
+
+    border-radius:20px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.1);
+
+}
+
+.receipt-container h1{
+
+    text-align:center;
+
+    color:#d97c63;
+
+    margin-bottom:5px;
+
+}
+
+.receipt-container h2{
+
+    text-align:center;
+
+    margin-top:0;
+
+}
+
+.receipt-container p{
+
+    margin:6px 0;
+
+}
+
+.receipt-summary p{
+
+    display:flex;
+
+    justify-content:space-between;
+
+}
+
+.receipt-item{
+
+    display:grid;
+
+    grid-template-columns:2fr 1fr 1fr;
+
+    gap:10px;
+
+    padding:10px 0;
+
+    border-bottom:1px dashed #ddd;
+
+}
+
+.receipt-item span:nth-child(2){
+
+    text-align:center;
+
+}
+
+.receipt-item span:last-child{
+
+    text-align:right;
+
+}
+
+.receipt-buttons{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin-top:20px;
+}
+
+.receipt-buttons button{
+    width:100%;
+    padding:14px;
+    font-size:16px;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+.thanks{
+
+    text-align:center;
+
+}
+
+@media print {
+
+    .receipt-buttons{
+        display:none;
+    }
+
+    body{
+        background:white;
+    }
+
+    .receipt-container{
+        box-shadow:none;
+        border:none;
+    }
+
+}
