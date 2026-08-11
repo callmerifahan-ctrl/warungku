@@ -1,0 +1,89 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f8f9fa;
+    color: #222;
+}
+
+.detail-container {
+    width: min(100% - 32px, 700px);
+    margin: 32px auto;
+}
+
+.detail-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.detail-header h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.detail-header button {
+    border: none;
+    background: transparent;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 8px 0;
+}
+
+.transaction-info,
+.items-section,
+.summary-section {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+}
+
+.transaction-info h2 {
+    margin: 0 0 8px;
+}
+
+.transaction-info p {
+    margin: 0;
+    color: #666;
+}
+
+.items-section h3 {
+    margin-top: 0;
+}
+
+.detail-item {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 16px;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.summary-section {
+    display: grid;
+    gap: 14px;
+}
+
+.summary-section div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.summary-section span {
+    color: #666;
+}
+
+.summary-section strong {
+    text-align: right;
+}

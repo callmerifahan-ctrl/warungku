@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Detail Transaksi - WarungKu</title>
+
+    <link rel="stylesheet" href="transaction-detail.css">
+</head>
+
+<body>
+
+    <main class="detail-container">
+
+        <header class="detail-header">
+            <button id="backButton" type="button">
+                ← Kembali
+            </button>
+
+            <h1>Detail Transaksi</h1>
+        </header>
+
+        <section class="transaction-info">
+
+            <h2 id="transactionCode">-</h2>
+            <p id="transactionDate">-</p>
+
+        </section>
+
+        <section class="items-section">
+
+            <h3>Daftar Barang</h3>
+
+            <div id="transactionItems"></div>
+
+        </section>
+
+        <section class="summary-section">
+
+            <div>
+                <span>Total Item</span>
+                <strong id="totalItems">0</strong>
+            </div>
+
+            <div>
+                <span>Total</span>
+                <strong id="transactionTotal">Rp0</strong>
+            </div>
+
+            <div>
+                <span>Pembayaran</span>
+                <strong id="transactionPayment">Rp0</strong>
+            </div>
+
+            <div>
+                <span>Kembalian</span>
+                <strong id="transactionChange">Rp0</strong>
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="transaction-detail.js"></script>
+
+</body>
+
+</html>

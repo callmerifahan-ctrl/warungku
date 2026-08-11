@@ -135,6 +135,13 @@ function renderReportList() {
         card.className =
             "transaction-card";
 
+        card.addEventListener("click", () => {
+
+            window.location.href =
+                `transaction-detail.html?id=${transaction.transactionCode}&source=report`;
+
+            });
+
         const code =
             document.createElement("h3");
 

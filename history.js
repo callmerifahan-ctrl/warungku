@@ -79,8 +79,8 @@ function createTransactionCard(transaction) {
 
     card.addEventListener("click", () => {
 
-        window.location.href =
-            `receipt.html?id=${transaction.transactionCode}`;
+    window.location.href =
+        `transaction-detail.html?id=${transaction.transactionCode}&source=history`;
 
     });
 

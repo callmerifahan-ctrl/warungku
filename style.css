@@ -648,3 +648,34 @@ li{
     }
 
 }
+
+/* ================================
+   MAIN NAVIGATION
+================================ */
+
+.main-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.nav-link {
+    display: inline-block;
+    padding: 10px 16px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #333;
+    background: #f1f1f1;
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+.nav-link:hover {
+    transform: translateY(-1px);
+}
+
+.nav-link.active {
+    background: #333;
+    color: #fff;
+}

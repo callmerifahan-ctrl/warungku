@@ -16,52 +16,72 @@
 
 <body>
 
-        <div class="container">
+    <div class="container">
 
-            <h1>🛒 Kasir</h1>
+                <h1>🛒 Kasir</h1>
 
-            <div class="cashier-box">
+                <nav class="main-nav">
 
-            <h2>Daftar Barang</h2>
+                    <a href="index.html" class="nav-link">
+                        📦 Inventori
+                    </a>
 
-            <div id="cashierItems"></div>
+                    <a href="cashier.html" class="nav-link active">
+                        🛒 Kasir
+                    </a>
+
+                    <a href="history.html" class="nav-link">
+                        📋 Riwayat Transaksi
+                    </a>
+
+                    <a href="report.html" class="nav-link">
+                        📊 Laporan
+                    </a>
+
+                </nav>
+
+                <div class="cashier-box">
+
+                <h2>Daftar Barang</h2>
+
+                <div id="cashierItems"></div>
+
+            </div>
+
+            <div class="cart-box">
+
+                <hr>
+
+                <h2>Keranjang</h2>
+
+                <div id="cartItems"></div>
+
+                <h2>Total</h2>
+
+                <h3 id="cartTotal">Rp 0</h3>
+
+                <h2>Pembayaran</h2>
+
+                <input
+                    id="paymentInput"
+                    type="number"
+                    placeholder="Masukkan uang pelanggan">
+
+                <h2>Kembalian</h2>
+
+                <h3 id="changeTotal">Rp 0</h3>
+
+                <button id="checkoutButton">
+                    💳 Bayar
+                </button>
+
+            </div>        
 
         </div>
 
-        <div class="cart-box">
-
-            <hr>
-
-            <h2>Keranjang</h2>
-
-            <div id="cartItems"></div>
-
-            <h2>Total</h2>
-
-            <h3 id="cartTotal">Rp 0</h3>
-
-            <h2>Pembayaran</h2>
-
-            <input
-                id="paymentInput"
-                type="number"
-                placeholder="Masukkan uang pelanggan">
-
-            <h2>Kembalian</h2>
-
-            <h3 id="changeTotal">Rp 0</h3>
-
-            <button id="checkoutButton">
-                💳 Bayar
-            </button>
-
-        </div>        
-
     </div>
 
-</div>
-
-<script src="cashier.js"></script>
+    <script src="cashier.js"></script>
 
 </body>
 
