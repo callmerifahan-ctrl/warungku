@@ -11,16 +11,24 @@
 
     <link rel="icon" type="image/png" href="images/logo-warungku.png">
 
-    <!-- PWA Manifest Link -->
-    <link rel="manifest" href="manifest.json">
+    <!-- Meta PWA Mobile -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#e06d53">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="images/logo.png">
 </head>
 <body>
 
     <div class="container">
 
-        <h1 class="logo-title">🛒 WarungKu</h1>
+        <!-- Header Logo -->
+        <div class="header-logo" style="text-align: center; margin-bottom: 20px;">
+            <img src="images/logo.png" alt="WarungKu Logo" style="width: 100px; height: 100px; object-fit: contain;">
+            <h1>WarungKu</h1>
+        </div>
 
         <nav class="main-nav">
 

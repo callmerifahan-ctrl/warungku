@@ -5,17 +5,13 @@
     {
       "src": "images/logo.png",
       "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "images/logo.png",
-      "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ],
   "start_url": "./index.html",
   "background_color": "#ffffff",
-  "theme_color": "#e06d53",
+  "theme_color": "#d67a63",
   "display": "standalone",
   "orientation": "portrait"
 }
