@@ -1,99 +1,49 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>WarungKu Report</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WarungKu - Laporan Penjualan</title>
     <link rel="stylesheet" href="style.css">
-
+    <link rel="icon" type="image/png" href="images/logo-warungku.png">
 </head>
-
 <body>
+    <div class="container">
+        <h1>📊 Laporan Penjualan</h1>
 
-    <h1>📊 Laporan Penjualan</h1>
+        <nav class="main-nav">
+            <a href="index.html" class="nav-link">📦 Inventori</a>
+            <a href="cashier.html" class="nav-link">🛒 Kasir</a>
+            <a href="history.html" class="nav-link">📋 Riwayat Transaksi</a>
+            <a href="report.html" class="nav-link active">📊 Laporan</a>
+        </nav>
 
-    <nav class="main-nav">
+        <section class="dashboard">
+            <div class="stat-card">
+                <p>Total Pendapatan</p>
+                <h2 id="totalRevenue">Rp 0</h2>
+            </div>
+            <div class="stat-card">
+                <p>Total Transaksi</p>
+                <h2 id="totalTransactions">0</h2>
+            </div>
+            <div class="stat-card">
+                <p>Barang Terjual</p>
+                <h2 id="totalItemsSold">0</h2>
+            </div>
+            <div class="stat-card">
+                <p>Produk Terlaris</p>
+                <h2 id="bestSeller">-</h2>
+            </div>
+        </section>
 
-        <a href="index.html" class="nav-link">
-            📦 Inventori
-        </a>
+        <section class="report-box">
+            <h2>📋 Riwayat Ringkas</h2>
+            <div id="reportList"></div>
+        </section>
+    </div>
 
-        <a href="cashier.html" class="nav-link">
-            🛒 Kasir
-        </a>
-
-        <a href="history.html" class="nav-link">
-            📋 Riwayat Transaksi
-        </a>
-
-        <a href="report.html" class="nav-link active">
-            📊 Laporan
-        </a>
-
-    </nav>
-
-    <section class="dashboard">
-
-        <div class="stat-card">
-
-            <p>Total Pendapatan</p>
-
-            <h2 id="totalRevenue">
-                Rp 0
-            </h2>
-
-        </div>
-
-        <div class="stat-card">
-
-            <p>Total Transaksi</p>
-
-            <h2 id="totalTransactions">
-                0
-            </h2>
-
-        </div>
-
-        <div class="stat-card">
-
-            <p>Barang Terjual</p>
-
-            <h2 id="totalItemsSold">
-                0
-            </h2>
-
-        </div>
-
-        <div class="stat-card">
-
-            <p>Produk Terlaris</p>
-
-            <h2 id="bestSeller">
-                -
-            </h2>
-
-        </div>
-
-    </section>
-
-    <section class="report-box">
-
-        <h2>📋 Riwayat Ringkas</h2>
-
-        <div id="reportList">
-
-        </div>
-
-    </section>
-
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="report.js"></script>
-
 </body>
-
 </html>

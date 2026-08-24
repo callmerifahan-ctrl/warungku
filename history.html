@@ -1,56 +1,28 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
-
-    <title>Riwayat Transaksi</title>
-
-    <link
-        rel="stylesheet"
-        href="style.css">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WarungKu - Riwayat Transaksi</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <link rel="icon" type="image/png" href="images/logo-warungku.png">
 </head>
-
 <body>
-
     <div class="container">
-
-        <h1>
-            🧾 Riwayat Transaksi
-        </h1>
+        <h1>🧾 Riwayat Transaksi</h1>
 
         <nav class="main-nav">
-
-            <a href="index.html" class="nav-link">
-                📦 Inventori
-            </a>
-
-            <a href="cashier.html" class="nav-link">
-                🛒 Kasir
-            </a>
-
-            <a href="history.html" class="nav-link active">
-                📋 Riwayat Transaksi
-            </a>
-
-            <a href="report.html" class="nav-link">
-                📊 Laporan
-            </a>
-
+            <a href="index.html" class="nav-link">📦 Inventori</a>
+            <a href="cashier.html" class="nav-link">🛒 Kasir</a>
+            <a href="history.html" class="nav-link active">📋 Riwayat Transaksi</a>
+            <a href="report.html" class="nav-link">📊 Laporan</a>
         </nav>
 
-        <div id="transactionList"></div>
-
+        <main id="transactionList"></main>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="history.js"></script>
-
 </body>
-
 </html>

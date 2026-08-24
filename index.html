@@ -9,12 +9,14 @@
 
     <link rel="stylesheet" href="style.css">
 
+    <link rel="icon" type="image/png" href="images/logo-warungku.png">
+
 </head>
 <body>
 
     <div class="container">
 
-        <h1>🛒 WarungKu</h1>
+        <h1 class="logo-title">🛒 WarungKu</h1>
 
         <nav class="main-nav">
 
@@ -108,6 +110,18 @@
                     <option value="ATK">✏️ ATK</option>
                 </select>
 
+            <div class="barcode-row">
+                <input
+                    type="text"
+                    id="scannedBarcode"
+                    placeholder="Barcode (opsional, scan atau kosongkan)"
+                    readonly>
+
+                <button type="button" id="btnScanBarcode" class="btn btn-secondary">
+                    📷 Scan
+                </button>
+            </div>
+
             <button id="btnTambah" class="btn btn-primary">
                     Tambah Barang
                 </button>
@@ -116,6 +130,32 @@
                     📄 Export CSV
                 </button>
 
+        </div>
+
+        <div id="scannerModal" class="scanner-modal">
+            <div class="scanner-box">
+                <h3>📷 Arahkan kamera ke barcode</h3>
+                <div id="scannerReader"></div>
+                <button type="button" id="btnCloseScanner" class="btn btn-secondary">
+                    Batal
+                </button>
+            </div>
+        </div>
+
+        <div id="barcodeModal" class="scanner-modal">
+            <div class="scanner-box barcode-label-box" id="barcodeLabelPrintArea">
+                <p id="barcodeItemName" class="label-name"></p>
+                <svg id="barcodeSvg"></svg>
+                <p id="barcodeItemPrice" class="label-price"></p>
+                <div class="barcode-modal-buttons">
+                    <button type="button" id="btnPrintBarcode" class="btn btn-primary">
+                        🖨 Cetak
+                    </button>
+                    <button type="button" id="btnCloseBarcode" class="btn btn-secondary">
+                        Tutup
+                    </button>
+                </div>
+            </div>
         </div>
 
         <div class="sort-box">
@@ -159,6 +199,9 @@
 
     <div id="toast" class="toast"></div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
     <script src="script.js"></script>
 
 </body>

@@ -1,210 +1,139 @@
-let transactions = [];
-let transaction = null;
+// ===================================
+// CONFIG & SUPABASE SETUP
+// ===================================
+const SUPABASE_URL = "https://dyyzsuleugpgiqutebwv.supabase.co";
+const SUPABASE_KEY = "sb_publishable_hKWVFsDZC539-T3nVyS13g_ME3HC0AP";
 
-const transactionCode =
-    document.getElementById("transactionCode");
+let supabaseClient = null;
 
-const transactionDate =
-    document.getElementById("transactionDate");
-
-const transactionItems =
-    document.getElementById("transactionItems");
-
-const totalItems =
-    document.getElementById("totalItems");
-
-const transactionTotal =
-    document.getElementById("transactionTotal");
-
-const transactionPayment =
-    document.getElementById("transactionPayment");
-
-const transactionChange =
-    document.getElementById("transactionChange");
-
-const backButton =
-    document.getElementById("backButton");
-
-
-function formatRupiah(value) {
-
-    return new Intl.NumberFormat(
-        "id-ID",
-        {
-            style: "currency",
-            currency: "IDR",
-            maximumFractionDigits: 0
+if (window.supabase) {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+        auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+            detectSessionInUrl: false
         }
-    ).format(value);
-
+    });
+} else {
+    console.error("Library Supabase belum terload di HTML!");
 }
 
+// ===================================
+// HELPER FUNCTIONS
+// ===================================
+function formatRupiah(value) {
+    return "Rp " + Number(value || 0).toLocaleString("id-ID");
+}
 
-function loadTransactions() {
+function getUrlParams() {
+    const params = new URLSearchParams(window.location.search);
+    return {
+        id: params.get("id"),
+        source: params.get("source")
+    };
+}
 
-    const data =
-        localStorage.getItem(
-            "warungkuTransactions"
-        );
+// ===================================
+// FETCH DATA FROM SUPABASE
+// ===================================
+async function fetchTransactionFromSupabase(code) {
+    if (!code || !supabaseClient) return null;
 
-    if (data) {
+    const { data, error } = await supabaseClient
+        .from("transaksi")
+        .select("*")
+        .eq("kode_transaksi", code)
+        .maybeSingle();
 
-        transactions =
-            JSON.parse(data);
-
+    if (error || !data) {
+        console.error("Error/Data tidak ditemukan:", error);
+        return null;
     }
 
+    return {
+        transactionCode: data.kode_transaksi,
+        date: data.tanggal ? new Date(data.tanggal).toLocaleString("id-ID") : "-",
+        items: data.item || [],
+        total: data.total,
+        payment: data.bayar,
+        change: data.kembalian
+    };
 }
 
-
-function getTransactionCode() {
-
-    const params =
-        new URLSearchParams(
-            window.location.search
-        );
-
-    return params.get("id");
-
-}
-
-
-function findTransaction() {
-
-    const code =
-        getTransactionCode();
-
-    transaction =
-        transactions.find((item) => {
-
-            return (
-                item.transactionCode === code
-            );
-
-        });
-
-}
-
-
-function renderTransactionDetail() {
+// ===================================
+// RENDER DETAIL
+// ===================================
+function renderTransactionDetail(transaction) {
+    const transactionCodeEl = document.getElementById("transactionCode");
+    const transactionDateEl = document.getElementById("transactionDate");
+    const transactionItemsEl = document.getElementById("transactionItems");
+    const totalItemsEl = document.getElementById("totalItems");
+    const transactionTotalEl = document.getElementById("transactionTotal");
+    const transactionPaymentEl = document.getElementById("transactionPayment");
+    const transactionChangeEl = document.getElementById("transactionChange");
 
     if (!transaction) {
-
-        transactionCode.textContent =
-            "Transaksi tidak ditemukan";
-
+        if (transactionCodeEl) transactionCodeEl.textContent = "Data tidak ditemukan!";
         return;
-
     }
 
-    transactionCode.textContent =
-        transaction.transactionCode;
+    if (transactionCodeEl) transactionCodeEl.textContent = transaction.transactionCode;
+    if (transactionDateEl) transactionDateEl.textContent = transaction.date;
 
-    transactionDate.textContent =
-        transaction.date;
+    if (transactionItemsEl) {
+        transactionItemsEl.replaceChildren();
+        let itemTotalCount = 0;
 
-    transactionItems.replaceChildren();
+        transaction.items.forEach((item) => {
+            const qty = Number(item.qty || 0);
+            const price = Number(item.price || 0);
+            itemTotalCount += qty;
 
-    let itemTotal = 0;
+            const row = document.createElement("div");
+            row.className = "detail-item";
 
-    transaction.items.forEach((item) => {
+            const name = document.createElement("span");
+            name.textContent = item.name;
 
-        itemTotal += item.qty;
+            const quantity = document.createElement("span");
+            quantity.textContent = `${qty} × ${formatRupiah(price)}`;
 
-        const row =
-            document.createElement("div");
+            const subtotal = document.createElement("strong");
+            subtotal.textContent = formatRupiah(qty * price);
 
-        row.className =
-            "detail-item";
+            row.append(name, quantity, subtotal);
+            transactionItemsEl.appendChild(row);
+        });
 
-        const name =
-            document.createElement("span");
-
-        name.textContent =
-            item.name;
-
-        const quantity =
-            document.createElement("span");
-
-        quantity.textContent =
-            `${item.qty} × ${formatRupiah(item.price)}`;
-
-        const subtotal =
-            document.createElement("strong");
-
-        subtotal.textContent =
-            formatRupiah(
-                item.qty * item.price
-            );
-
-        row.append(
-            name,
-            quantity,
-            subtotal
-        );
-
-        transactionItems.appendChild(row);
-
-    });
-
-    totalItems.textContent =
-        itemTotal;
-
-    transactionTotal.textContent =
-        formatRupiah(
-            transaction.total
-        );
-
-    transactionPayment.textContent =
-        formatRupiah(
-            transaction.payment
-        );
-
-    transactionChange.textContent =
-        formatRupiah(
-            transaction.change
-        );
-
-}
-
-
-function init() {
-
-    loadTransactions();
-
-    findTransaction();
-
-    renderTransactionDetail();
-
-}
-
-
-backButton.addEventListener(
-    "click",
-    () => {
-
-        const params =
-            new URLSearchParams(
-                window.location.search
-            );
-
-        const source =
-            params.get("source");
-
-        if (source === "report") {
-
-            window.location.href =
-                "report.html";
-
-            return;
-
-        }
-
-        window.location.href =
-            "history.html";
-
+        if (totalItemsEl) totalItemsEl.textContent = itemTotalCount;
     }
-);
 
+    if (transactionTotalEl) transactionTotalEl.textContent = formatRupiah(transaction.total);
+    if (transactionPaymentEl) transactionPaymentEl.textContent = formatRupiah(transaction.payment);
+    if (transactionChangeEl) transactionChangeEl.textContent = formatRupiah(transaction.change);
+}
 
-init();
+// ===================================
+// INIT & EVENT LISTENERS
+// ===================================
+async function init() {
+    const { id, source } = getUrlParams();
+
+    // Navigasi Tombol Kembali
+    const backButton = document.getElementById("backButton");
+    if (backButton) {
+        backButton.addEventListener("click", () => {
+            if (source === "report") {
+                window.location.href = "report.html";
+            } else {
+                window.location.href = "history.html";
+            }
+        });
+    }
+
+    // Load Data Transaksi
+    const transaction = await fetchTransactionFromSupabase(id);
+    renderTransactionDetail(transaction);
+}
+
+document.addEventListener("DOMContentLoaded", init);

@@ -1,96 +1,64 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Detail Transaksi - WarungKu</title>
-
+    <title>WarungKu - Detail Transaksi</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="transaction-detail.css">
-
+    
+    <link rel="icon" type="image/png" href="images/logo-warungku.png">
 </head>
-
 <body>
+    <div class="container">
+        <nav class="main-nav">
+            <a href="index.html" class="nav-link">📦 Inventori</a>
+            <a href="cashier.html" class="nav-link">🛒 Kasir</a>
+            <a href="history.html" class="nav-link">📋 Riwayat Transaksi</a>
+            <a href="report.html" class="nav-link">📊 Laporan</a>
+        </nav>
 
-    <nav class="main-nav">
+        <main class="detail-container">
+            <header class="detail-header">
+                <button id="backButton" class="btn-kembali">⬅ Kembali</button>
+                <h1>📋 Detail Transaksi</h1>
+            </header>
 
-                    <a href="index.html" class="nav-link">
-                        📦 Inventori
-                    </a>
+            <section class="transaction-info">
+                <h2 id="transactionCode">-</h2>
+                <p id="transactionDate">-</p>
+            </section>
 
-                    <a href="cashier.html" class="nav-link">
-                        🛒 Kasir
-                    </a>
+            <section class="items-section">
+                <h3>Daftar Barang</h3>
+                <div id="transactionItems"></div>
+            </section>
 
-                    <a href="history.html" class="nav-link">
-                        📋 Riwayat Transaksi
-                    </a>
+            <section class="summary-section">
+                <h3>💳 Ringkasan Pembayaran</h3>            
+                <div>
+                    <span>Total Item</span>
+                    <strong id="totalItems">0</strong>
+                </div>
+                <div>
+                    <span>Total</span>
+                    <strong id="transactionTotal">Rp0</strong>
+                </div>
+                <div>
+                    <span>Pembayaran</span>
+                    <strong id="transactionPayment">Rp0</strong>
+                </div>
+                <div>
+                    <span>Kembalian</span>
+                    <strong id="transactionChange">Rp0</strong>
+                </div>
+            </section>
+        </main>
+    </div>
 
-                    <a href="report.html" class="nav-link">
-                        📊 Laporan
-                    </a>
+    <!-- 1. Panggil Library Supabase CDN DULUAN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-                </nav>
-
-    <main class="detail-container">
-
-        <header class="detail-header">
-
-            <button id="backButton" type="button">
-                ← Kembali
-            </button>
-
-            <h1>📋 Detail Transaksi</h1>
-
-        </header>
-
-        <section class="transaction-info">
-
-            <h2 id="transactionCode">-</h2>
-            <p id="transactionDate">-</p>
-
-        </section>
-
-        <section class="items-section">
-
-            <h3>Daftar Barang</h3>
-
-            <div id="transactionItems"></div>
-
-        </section>
-
-        <section class="summary-section">
-
-            <h3>💰 Ringkasan Pembayaran</h3>            
-
-            <div>
-                <span>Total Item</span>
-                <strong id="totalItems">0</strong>
-            </div>
-
-            <div>
-                <span>Total</span>
-                <strong id="transactionTotal">Rp0</strong>
-            </div>
-
-            <div>
-                <span>Pembayaran</span>
-                <strong id="transactionPayment">Rp0</strong>
-            </div>
-
-            <div>
-                <span>Kembalian</span>
-                <strong id="transactionChange">Rp0</strong>
-            </div>
-
-        </section>
-
-    </main>
-
+    <!-- 2. Panggil JS Detail Transaksi SETELAHNYA -->
     <script src="transaction-detail.js"></script>
-
 </body>
-
 </html>

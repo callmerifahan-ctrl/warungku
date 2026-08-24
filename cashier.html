@@ -1,88 +1,74 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>WarungKu Kasir</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WarungKu - Kasir</title>
     <link rel="stylesheet" href="style.css">
-
+    
+    <link rel="icon" type="image/png" href="images/logo-warungku.png">
 </head>
-
 <body>
-
     <div class="container">
+        <h1>🛒 Kasir</h1>
 
-                <h1>🛒 Kasir</h1>
+        <nav class="main-nav">
+            <a href="index.html" class="nav-link">📦 Inventori</a>
+            <a href="cashier.html" class="nav-link active">🛒 Kasir</a>
+            <a href="history.html" class="nav-link">📋 Riwayat Transaksi</a>
+            <a href="report.html" class="nav-link">📊 Laporan</a>
+        </nav>
 
-                <nav class="main-nav">
-
-                    <a href="index.html" class="nav-link">
-                        📦 Inventori
-                    </a>
-
-                    <a href="cashier.html" class="nav-link active">
-                        🛒 Kasir
-                    </a>
-
-                    <a href="history.html" class="nav-link">
-                        📋 Riwayat Transaksi
-                    </a>
-
-                    <a href="report.html" class="nav-link">
-                        📊 Laporan
-                    </a>
-
-                </nav>
-
-                <div class="cashier-box">
-
+        <div class="cashier-layout">
+            <div class="cashier-box">
                 <h2>Daftar Barang</h2>
-
+                <button type="button" id="btnScanCashier" class="btn btn-primary">
+                    📷 Scan Barang
+                </button>
                 <div id="cashierItems"></div>
-
             </div>
 
             <div class="cart-box">
+                <h2>Keranjang</h2>
+                <div id="cartItems"></div>
 
                 <hr>
 
-                <h2>Keranjang</h2>
+                <div class="cart-summary">
+                    <h3>Total</h3>
+                    <h3 id="cartTotal" class="total-amount">Rp 0</h3>
+                </div>
 
-                <div id="cartItems"></div>
+                <div class="payment-group">
+                    <label for="paymentInput"><strong>Pembayaran</strong></label>
+                    <input id="paymentInput" type="number" placeholder="Masukkan uang pelanggan">
+                </div>
 
-                <h2>Total</h2>
+                <div class="change-group">
+                    <label><strong>Kembalian</strong></label>
+                    <h3 id="changeTotal">Rp 0</h3>
+                </div>
 
-                <h3 id="cartTotal">Rp 0</h3>
-
-                <h2>Pembayaran</h2>
-
-                <input
-                    id="paymentInput"
-                    type="number"
-                    placeholder="Masukkan uang pelanggan">
-
-                <h2>Kembalian</h2>
-
-                <h3 id="changeTotal">Rp 0</h3>
-
-                <button id="checkoutButton">
+                <button id="checkoutButton" class="btn btn-success">
                     💳 Bayar
                 </button>
-
-            </div>        
-
+            </div>
         </div>
-
     </div>
 
+    <!-- Scanner Modal -->
+    <div id="scannerModal" class="scanner-modal">
+        <div class="scanner-box">
+            <h3>📷 Arahkan kamera ke barcode</h3>
+            <div id="scannerReader"></div>
+            <button type="button" id="btnCloseScanner" class="btn btn-secondary">
+                Batal
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="cashier.js"></script>
-
 </body>
-
 </html>

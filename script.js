@@ -1,10 +1,25 @@
 // ===================================
-// DATA 
+// CONFIG & SUPABASE SETUP
 // ===================================
+const SUPABASE_URL = "https://dyyzsuleugpgiqutebwv.supabase.co";
+const SUPABASE_KEY = "sb_publishable_hKWVFsDZC539-T3nVyS13g_ME3HC0AP";
 
+// Tambahkan opsi auth ini agar Supabase tidak menyentuh Storage browser
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false
+    }
+});
+
+// ===================================
+// DATA & CONSTANTS
+// ===================================
 let items = [];
 let editingIndex = -1;
 let activeCategory = "Semua";
+let html5QrCode = null;
 
 const PREFIX_MAP = {
     Minuman: "MNM",
@@ -17,7 +32,7 @@ const PREFIX_MAP = {
 };
 
 const CATEGORY_ICONS = {
-    Semua:"📦",
+    Semua: "📦",
     Minuman: "🥤",
     Makanan: "🍜",
     Snack: "🍪",
@@ -27,17 +42,18 @@ const CATEGORY_ICONS = {
     ATK: "✏️"
 };
 
-/* ==================================================
-   DOM ELEMENTS
-================================================== */
-
+// ===================================
+// DOM ELEMENTS
+// ===================================
 const itemNameInput = document.getElementById("itemName");
 const itemStockInput = document.getElementById("itemStock");
+const buyPriceInput = document.getElementById("buyPrice");
+const sellPriceInput = document.getElementById("sellPrice");
 const categorySelect = document.getElementById("category");
+const scannedBarcodeInput = document.getElementById("scannedBarcode");
 
 const btnTambah = document.getElementById("btnTambah");
 const exportButton = document.getElementById("exportButton");
-
 const searchInput = document.getElementById("searchInput");
 const sortSelect = document.getElementById("sortSelect");
 
@@ -55,100 +71,175 @@ const dashboardDetailList = document.getElementById("dashboardDetailList");
 
 const cardStokMenipis = document.getElementById("cardStokMenipis");
 const cardBarangHabis = document.getElementById("cardBarangHabis");
-
 const categoryContainer = document.getElementById("categoryContainer");
-
 const toast = document.getElementById("toast");
 
-const buyPriceInput = document.getElementById("buyPrice");
-const sellPriceInput = document.getElementById("sellPrice");
+const btnScanBarcode = document.getElementById("btnScanBarcode");
+const btnCloseScanner = document.getElementById("btnCloseScanner");
+const scannerModal = document.getElementById("scannerModal");
+
+const barcodeModal = document.getElementById("barcodeModal");
+const barcodeSvg = document.getElementById("barcodeSvg");
+const barcodeItemName = document.getElementById("barcodeItemName");
+const barcodeItemPrice = document.getElementById("barcodeItemPrice");
+const btnCloseBarcode = document.getElementById("btnCloseBarcode");
+const btnPrintBarcode = document.getElementById("btnPrintBarcode");
 
 // ===================================
-// STORAGE
+// UTILITIES & HELPERS
 // ===================================
-
-function saveData() {
-    localStorage.setItem("warungkuItems", JSON.stringify(items));
+function formatRupiah(angka) {
+    return "Rp " + Number(angka || 0).toLocaleString("id-ID");
 }
 
-function loadData() {
-    const data = localStorage.getItem("warungkuItems");
+function showToast(message, type = "success") {
+    if (!toast) return;
+    toast.textContent = message;
+    toast.className = "toast";
 
-    if (data) {
-        items = JSON.parse(data);
+    if (type === "success") toast.style.background = "var(--success)";
+    if (type === "warning") toast.style.background = "var(--warning)";
+    if (type === "danger") toast.style.background = "var(--danger)";
 
-        migrateItems();
-    }
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2500);
 }
 
-function migrateItems() {
-
-    const counters = {};
-
-    Object.keys(PREFIX_MAP).forEach((key) => {
-        counters[key] = 0;
-    });
-
-    let changed = false;
-
-    items.forEach(item => {
-
-        if (item.buyPrice === undefined) {
-            item.buyPrice = 0;
-            changed = true;
-        }
-
-        if (item.sellPrice === undefined) {
-            item.sellPrice = 0;
-            changed = true;
-        }
-
-    });
-
-    if (changed) {
-        saveData();
-    }
-
+function getItemById(id) {
+    return items.find(item => item.id === id);
 }
 
-function renderItems() {
-
-    const keyword =
-    searchInput.value.toLowerCase();
-
-    itemList.replaceChildren();
-
-    
-
-    let filteredItems = items;
-
-    if (activeCategory !== "Semua") {
-
-        filteredItems = items.filter((item) => {
-            
-            return item.category === activeCategory;
-        
+function generateItemCode(category) {
+    const prefix = PREFIX_MAP[category] || "BRG";
+    const categoryCodes = items
+        .filter(item => item.category === category)
+        .map(item => {
+            const number = item.code?.replace(prefix, "");
+            return parseInt(number, 10) || 0;
         });
 
+    const lastNumber = categoryCodes.length > 0 ? Math.max(...categoryCodes) : 0;
+    return prefix + String(lastNumber + 1).padStart(4, "0");
+}
+
+function resetForm() {
+    itemNameInput.value = "";
+    itemStockInput.value = "";
+    buyPriceInput.value = "";
+    sellPriceInput.value = "";
+    categorySelect.value = "Minuman";
+
+    if (scannedBarcodeInput) scannedBarcodeInput.value = "";
+    editingIndex = -1;
+    if (btnTambah) btnTambah.textContent = "Tambah Barang";
+    itemNameInput.focus();
+}
+
+function refreshUI() {
+    renderItems();
+}
+
+// ===================================
+// DATABASE OPERATIONS (SUPABASE)
+// ===================================
+async function loadDataSupabase() {
+    const { data, error } = await supabaseClient
+        .from("barang")
+        .select("*")
+        .order("id");
+
+    if (error) {
+        console.error("Error memuat barang:", error);
+        showToast("Gagal memuat data barang!", "danger");
+        return;
+    }
+
+    items = (data || []).map(item => ({
+        id: item.id,
+        name: item.nama,
+        stock: item.stok,
+        buyPrice: item.harga_beli,
+        sellPrice: item.harga_jual,
+        category: item.kategori,
+        code: item.barcode
+    }));
+}
+
+async function addItem() {
+    const itemName = itemNameInput.value.trim();
+    const itemStock = parseInt(itemStockInput.value, 10);
+    const itemBuyPrice = parseInt(buyPriceInput.value, 10);
+    const itemSellPrice = parseInt(sellPriceInput.value, 10);
+    const itemCategory = categorySelect.value;
+
+    if (!itemName) return showToast("Nama barang wajib diisi!", "warning");
+    if (isNaN(itemStock)) return showToast("Stok barang wajib diisi!", "warning");
+    if (isNaN(itemBuyPrice)) return showToast("Harga beli wajib diisi!", "warning");
+    if (isNaN(itemSellPrice)) return showToast("Harga jual wajib diisi!", "warning");
+
+    if (editingIndex === -1) {
+        const scannedCode = scannedBarcodeInput ? scannedBarcodeInput.value.trim() : "";
+        const newItem = {
+            nama: itemName,
+            stok: itemStock,
+            harga_beli: itemBuyPrice,
+            harga_jual: itemSellPrice,
+            kategori: itemCategory,
+            barcode: scannedCode || generateItemCode(itemCategory)
+        };
+
+        const { error } = await supabaseClient.from("barang").insert([newItem]);
+        if (error) {
+            console.error("ERROR INSERT:", error);
+            return showToast("Gagal menyimpan barang!", "danger");
+        }
+        showToast("Barang berhasil ditambahkan!", "success");
+    } else {
+        const updatedItem = {
+            nama: itemName,
+            stok: itemStock,
+            harga_beli: itemBuyPrice,
+            harga_jual: itemSellPrice,
+            kategori: itemCategory
+        };
+
+        const { error } = await supabaseClient
+            .from("barang")
+            .update(updatedItem)
+            .eq("id", items[editingIndex].id);
+
+        if (error) {
+            console.error("ERROR UPDATE:", error);
+            return showToast("Gagal memperbarui barang!", "danger");
+        }
+        showToast("Barang berhasil diubah!", "success");
+    }
+
+    await loadDataSupabase();
+    refreshUI();
+    resetForm();
+}
+
+// ===================================
+// RENDERERS
+// ===================================
+function renderItems() {
+    const keyword = searchInput.value.toLowerCase();
+    itemList.replaceChildren();
+
+    let filteredItems = items;
+    if (activeCategory !== "Semua") {
+        filteredItems = items.filter(item => item.category === activeCategory);
     }
 
     filteredItems.forEach((item) => {
+        const cocokNama = (item.name || "").toLowerCase().includes(keyword);
+        const cocokKode = (item.code || "").toLowerCase().includes(keyword);
 
-        const cocokNama =
-            item.name.toLowerCase().includes(keyword);
+        if (!cocokNama && !cocokKode) return;
 
-        const cocokKode =
-            item.code &&
-            item.code.toLowerCase().includes(keyword);
-
-        if (!cocokNama && !cocokKode) {
-            return;
-        }
-
-        const li = createItem(item);
-
+        const li = createItemElement(item);
         itemList.appendChild(li);
-
     });
 
     updateDashboard();
@@ -156,57 +247,36 @@ function renderItems() {
     renderCategoryCards();
 }
 
-function createItem(item) {
-
-    const itemHeader = document.createElement("div");
-    itemHeader.className = "item-header";
-
-    const itemName = document.createElement("strong");
-    itemName.textContent = item.name;
-
-    itemHeader.appendChild(itemName);
-
+function createItemElement(item) {
     const li = document.createElement("li");
 
     const title = document.createElement("strong");
     title.textContent = item.name;
 
-    const br1 = document.createElement("br");
-
     const code = document.createElement("small");
     code.textContent = `Kode: ${item.code}`;
 
-    const br3 = document.createElement("br");
-
     const buyPrice = document.createElement("small");
-    buyPrice.textContent =
-        `Modal : ${formatRupiah(item.buyPrice)}`;
-
-    const br4 = document.createElement("br");
+    buyPrice.textContent = `Modal : ${formatRupiah(item.buyPrice)}`;
 
     const sellPrice = document.createElement("small");
-    sellPrice.textContent =
-        `Jual : ${formatRupiah(item.sellPrice)}`;
+    sellPrice.textContent = `Jual : ${formatRupiah(item.sellPrice)}`;
 
-    const br2 = document.createElement("br");
+    li.append(
+        title, document.createElement("br"),
+        code, document.createElement("br"),
+        buyPrice, document.createElement("br"),
+        sellPrice, document.createElement("br")
+    );
 
-    li.append(title, br1, code, br2,buyPrice,br3,sellPrice,br4);
-
-    // badge stok menipis
     if (item.stock <= 5) {
-
         const badge = document.createElement("span");
         badge.className = "low-stock";
         badge.textContent = "⚠️ Stok Menipis";
-
         li.appendChild(badge);
-
     }
 
-    // =========================
-    // STOCK CONTROLS
-    // =========================
-
+    // Stock Controls
     const controlsRow = document.createElement("div");
     controlsRow.className = "controls-row";
 
@@ -215,16 +285,13 @@ function createItem(item) {
 
     const minusBtn = document.createElement("button");
     minusBtn.textContent = "➖";
-
-    minusBtn.addEventListener("click", () => {
-
+    minusBtn.addEventListener("click", async () => {
         if (item.stock === 0) return;
-
-        item.stock--;
-
-        saveData();
+        const newStock = item.stock - 1;
+        const { error } = await supabaseClient.from("barang").update({ stok: newStock }).eq("id", item.id);
+        if (error) return showToast("Gagal mengurangi stok!", "danger");
+        await loadDataSupabase();
         refreshUI();
-
     });
 
     const stockText = document.createElement("strong");
@@ -233,552 +300,218 @@ function createItem(item) {
 
     const plusBtn = document.createElement("button");
     plusBtn.textContent = "➕";
-
-    plusBtn.addEventListener("click", () => {
-
-        item.stock++;
-
-        saveData();
+    plusBtn.addEventListener("click", async () => {
+        const newStock = item.stock + 1;
+        const { error } = await supabaseClient.from("barang").update({ stok: newStock }).eq("id", item.id);
+        if (error) return showToast("Gagal menambah stok!", "danger");
+        await loadDataSupabase();
         refreshUI();
-
     });
 
-    stockControls.append(
-        minusBtn,
-        stockText,
-        plusBtn
-    );
+    stockControls.append(minusBtn, stockText, plusBtn);
 
-    // =========================
-    // ACTION BUTTONS
-    // =========================
-
+    // Action Buttons
     const actionButtons = document.createElement("div");
     actionButtons.className = "action-buttons";
+    createActionButtons(actionButtons, item.id);
 
-    createButtons(actionButtons, item.id);
-
-    controlsRow.append(
-        stockControls,
-        actionButtons
-    );
-
+    controlsRow.append(stockControls, actionButtons);
     li.appendChild(controlsRow);
 
     return li;
-
 }
 
-// ===================================
-// SKU
-// ===================================
+function createActionButtons(container, id) {
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "🗑";
+    deleteBtn.addEventListener("click", async () => {
+        if (confirm("Apakah Anda yakin ingin menghapus barang ini?")) {
+            const { error } = await supabaseClient.from("barang").delete().eq("id", id);
+            if (error) return showToast("Gagal menghapus barang!", "danger");
+            await loadDataSupabase();
+            refreshUI();
+            showToast("Barang berhasil dihapus!");
+        }
+    });
 
-function generateItemCode(category) {
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "✏️";
+    editBtn.addEventListener("click", () => {
+        const index = items.findIndex(i => i.id === id);
+        if (index === -1) return showToast("Barang tidak ditemukan!", "danger");
 
-    const prefix = PREFIX_MAP[category];
+        itemNameInput.value = items[index].name;
+        itemStockInput.value = items[index].stock;
+        buyPriceInput.value = items[index].buyPrice;
+        sellPriceInput.value = items[index].sellPrice;
+        categorySelect.value = items[index].category;
 
-    // Ambil semua kode pada kategori yang sama
-    const categoryCodes = items
-        .filter(item => item.category === category)
-        .map(item => {
-            const number = item.code?.replace(prefix, "");
-            return parseInt(number) || 0;
-        });
+        editingIndex = index;
+        btnTambah.textContent = "💾 Simpan Perubahan";
+    });
 
-    // Cari nomor terbesar
-    const lastNumber = categoryCodes.length > 0
-        ? Math.max(...categoryCodes)
-        : 0;
+    const barcodeBtn = document.createElement("button");
+    barcodeBtn.textContent = "🏷️";
+    barcodeBtn.title = "Cetak Barcode";
+    barcodeBtn.addEventListener("click", () => openBarcodeLabel(id));
 
-    // Tambah 1
-    const newNumber = lastNumber + 1;
-
-    return prefix + String(newNumber).padStart(4, "0");
+    container.append(deleteBtn, editBtn, barcodeBtn);
 }
 
-/* ==================================================
-   HELPERS
-================================================== */
-
-function refreshUI() {
-
-    renderItems();
-
-}
-
-function resetForm() {
-
-    itemNameInput.value = "";
-    itemStockInput.value = "";
-
-    buyPriceInput.value = "";
-    sellPriceInput.value = "";
-
-    categorySelect.value = "Minuman";
-
-    itemNameInput.focus();
-
-}
-
-function formatRupiah(angka) {
-
-    return "Rp " + angka.toLocaleString("id-ID");
-
-}
-
-function showToast(message, type = "success") {
-
-    toast.textContent = message;
-
-    toast.className = "toast";
-
-    if(type === "success"){
-        toast.style.background = "var(--success)";
-    }
-
-    if(type === "warning"){
-        toast.style.background = "var(--warning)";
-    }
-
-    if(type === "danger"){
-        toast.style.background = "var(--danger)";
-    }
-
-    toast.classList.add("show");
-
-    setTimeout(() => {
-
-        toast.classList.remove("show");
-
-    },2500);
-
-}
-
-function getItemById(id){
-
-    return items.find(item => item.id === id);
-
-}
-
-// ===================================
-// CRUD
-// ===================================
-
-function addItem() {
-
-    const itemName =
-    itemNameInput.value.trim();
-
-    const itemStock =
-        parseInt(itemStockInput.value);
-
-    const itemBuyPrice =
-        parseInt(buyPriceInput.value);
-
-    const itemSellPrice =
-        parseInt(sellPriceInput.value);
-
-    const itemCategory =
-        categorySelect.value;
-
-    if (itemName === "") {
-        showToast("Nama barang wajib diisi!");
-        return;
-    }
-
-    if (isNaN(itemStock)) {
-        showToast("Stok barang wajib diisi!");
-        return;
-    }
-
-    if (isNaN(itemBuyPrice)) {
-
-        showToast("Harga beli wajib diisi!");
-
-        return;
-
-    }
-
-    if (isNaN(itemSellPrice)) {
-
-        showToast("Harga jual wajib diisi!");
-
-        return;
-
-    }
-
-    if (editingIndex === -1) {
-
-        const newItem = {
-            id: Date.now(),
-            code: generateItemCode(itemCategory),
-            category: itemCategory,
-            name: itemName,
-
-            stock: itemStock,
-
-            buyPrice: itemBuyPrice,
-            sellPrice: itemSellPrice
-        };
-
-        items.push(newItem);
-
-    } else {
-
-        items[editingIndex] = {
-            id: items[editingIndex].id,
-            code: items[editingIndex].code,
-            category: itemCategory,
-            name: itemName,
-            stock: itemStock,
-            buyPrice: itemBuyPrice,
-            sellPrice: itemSellPrice
-        };
-
-        editingIndex = -1;
-
-        btnTambah.textContent =
-            "Tambah Barang";
-    }
-
-    saveData();
-    refreshUI();
-    resetForm();
-    showToast("Barang Berhasil disimpan!");
+function updateDashboard() {
+    dashboardTotalBarang.textContent = items.length;
+    dashboardTotalStok.textContent = items.reduce((sum, item) => sum + item.stock, 0);
+    dashboardStokMenipis.textContent = items.filter(item => item.stock <= 5).length;
+    dashboardBarangHabis.textContent = items.filter(item => item.stock === 0).length;
 }
 
 function updateTotal() {
-
-    totalItems.textContent =
-    `Total Barang : ${items.length}`;
-
-}
-
-// ===================================
-// DASHBOARD
-// ===================================
-
-function updateDashboard() {
-
-    // Total Barang
-    dashboardTotalBarang.textContent =
-        items.length;
-
-    // Total Stok
-    dashboardTotalStok
-
-    let jumlahStok = 0;
-
-    items.forEach((item) => {
-        jumlahStok += item.stock;
-    });
-
-    dashboardTotalStok.textContent = jumlahStok;
-
-    // Stok Menipis
-    dashboardStokMenipis
-
-    let jumlahStokMenipis = 0;
-
-    items.forEach((item) => {
-        if (item.stock <= 5) {
-            jumlahStokMenipis++;
-        }
-    });
-
-    dashboardStokMenipis.textContent = jumlahStokMenipis;
-
-    // Barang Habis
-    dashboardBarangHabis
-
-    let jumlahBarangHabis = 0;
-
-    items.forEach((item) => {
-        if (item.stock === 0) {
-            jumlahBarangHabis++;
-        }
-    });
-
-    dashboardBarangHabis.textContent = jumlahBarangHabis;
+    totalItems.textContent = `Total Barang : ${items.length}`;
 }
 
 function renderCategoryCards() {
-
     categoryContainer.replaceChildren();
-
-    const categories = [
-        "Semua",
-        ...Object.keys(PREFIX_MAP)
-    ];
+    const categories = ["Semua", ...Object.keys(PREFIX_MAP)];
 
     categories.forEach((kategori) => {
-
-        const jumlah = getJumlahKategori(kategori);
-        const icon = CATEGORY_ICONS[kategori];
+        const count = kategori === "Semua" ? items.length : items.filter(i => i.category === kategori).length;
+        const icon = CATEGORY_ICONS[kategori] || "📦";
 
         const card = document.createElement("div");
-        card.className = "stat-card";
-
+        card.className = `stat-card ${activeCategory === kategori ? "active" : ""}`;
         card.innerHTML = `
             <div class="card-header">
                 <div class="icon">${icon}</div>
                 <p>${kategori}</p>
             </div>
-
-            <h2>${jumlah}</h2>
+            <h2>${count}</h2>
         `;
 
-        if (activeCategory === kategori) {
-            card.classList.add("active");
-        }
-
         card.addEventListener("click", () => {
-
             activeCategory = kategori;
-
             renderItems();
-
         });
 
         categoryContainer.appendChild(card);
-
     });
-
 }
 
 // ===================================
-// EXPORT
+// MODAL & SCANNER
 // ===================================
+function openScanner() {
+    scannerModal.classList.add("show");
+    html5QrCode = new Html5Qrcode("scannerReader");
+    html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: 220 },
+        (decodedText) => {
+            scannedBarcodeInput.value = decodedText;
+            showToast(`Barcode terdeteksi: ${decodedText}`);
+            closeScanner();
+        },
+        () => {}
+    ).catch((err) => {
+        console.error(err);
+        showToast("Kamera tidak bisa diakses!", "danger");
+        closeScanner();
+    });
+}
+
+function closeScanner() {
+    if (html5QrCode) {
+        html5QrCode.stop().then(() => html5QrCode.clear()).catch(() => {});
+        html5QrCode = null;
+    }
+    scannerModal.classList.remove("show");
+}
+
+function openBarcodeLabel(id) {
+    const item = getItemById(id);
+    if (!item) return showToast("Barang tidak ditemukan!", "danger");
+
+    barcodeItemName.textContent = item.name;
+    barcodeItemPrice.textContent = formatRupiah(item.sellPrice);
+
+    JsBarcode(barcodeSvg, item.code, {
+        format: "CODE128",
+        width: 2,
+        height: 60,
+        displayValue: true,
+        fontSize: 14
+    });
+
+    barcodeModal.classList.add("show");
+}
 
 function exportCSV() {
-
     const csvData = items.map((item) => {
-
-        let status = "";
-
-        if (item.stock === 0) {
-            status = "Habis";
-        } else if (item.stock <= 5) {
-            status = "Menipis";
-        } else {
-            status = "Normal";
-        }
-
-        return `${item.name},${item.stock},${status}`;
-
+        let status = item.stock === 0 ? "Habis" : item.stock <= 5 ? "Menipis" : "Normal";
+        return `"${item.name}",${item.stock},${status}`;
     });
 
-    const header = "Nama Barang,Stok,Status";
-    const csvContent = header + "\n" + csvData.join("\n");
-
-    const blob = new Blob([csvContent], {
-        type: "text/csv"
-    });
-
-    const url = URL.createObjectURL(blob);
-
+    const csvContent = "Nama Barang,Stok,Status\n" + csvData.join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
-    link.href = url;
-    link.download = "inventori.csv";
-
+    link.href = URL.createObjectURL(blob);
+    link.download = "inventori_warungku.csv";
     link.click();
-
-    URL.revokeObjectURL(url);
-
+    URL.revokeObjectURL(link.href);
 }
 
-function createButtons(actionButtons, id) {
-
-    const deleteBtn = document.createElement("button");
-
-    deleteBtn.textContent = "🗑";
-
-    deleteBtn.addEventListener("click", () => {
-
-        if (confirm("Apakah kamu yakin ingin menghapus barang ini?")) {
-
-            const index = items.findIndex(i => i.id === id);
-
-            if (index === -1) {
-                showToast("Barang tidak ditemukan!");
-                return;
-            }
-
-            items.splice(index, 1);
-
-            saveData();
-
-            refreshUI();
-
-            showToast("Barang Berhasil dihapus!");
-
-        }
-
-    });
-
-    const editBtn = document.createElement("button");
-    editBtn.textContent = "✏️";
-
-    editBtn.addEventListener("click", () => {
-
-        const index = items.findIndex(i => i.id === id);
-
-        if (index === -1) {
-            showToast("Barang tidak ditemukan!");
-            return;
-        }
-
-        itemNameInput.value =
-            items[index].name;
-
-        itemStockInput.value =
-            items[index].stock;
-
-        buyPriceInput.value =
-        items[index].buyPrice;
-
-        sellPriceInput.value =
-            items[index].sellPrice;
-
-        // dulu kategori gak ikut ke-restore pas edit
-        categorySelect.value =
-            items[index].category;
-
-        editingIndex = index;
-
-        btnTambah.textContent =
-            "💾 Simpan Perubahan";
-
-    });
-
-    actionButtons.appendChild(deleteBtn);
-    actionButtons.appendChild(editBtn);
-
-
-}
-
-function bukaStokMenipis() {
-
-    const daftarBarang = items.filter((item) => {
-       return item.stock <= 5;
-    });
-
-    tampilkanDetailDashboard(
-        "⚠️ Barang Stok Menipis",
-        daftarBarang
-    );
-
-}
-
-function bukaBarangHabis() {
-
-    const daftarBarang = items.filter((item) => {
-       return item.stock === 0;
-    });
-
-    tampilkanDetailDashboard(
-        "❌ Barang Habis",
-        daftarBarang
-    );
-
-}
-
-function tampilkanDetailDashboard(judul, daftarBarang) {
-
-    dashboardDetail.style.display = "block";
-
-    dashboardDetailTitle.textContent = judul;
-
-    dashboardDetailList.replaceChildren();
-
-    daftarBarang.forEach((item) => {
-        const li = document.createElement("li");
-        li.textContent = `${item.name} - ${item.stock}`;
-        dashboardDetailList.appendChild(li);
-    });
-
-}
-
-itemStockInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-        addItem();
-    }
-});
-
-function getJumlahKategori(kategori) {
-
-    if (kategori === "Semua") {
-      return items.length;
-    }
-    
-    const data = items.filter((item) => {
-        return item.category === kategori;
-    });
-
-    return data.length;
-
-}
-
-function hitungKategori(kategori, elementId) {
-    const data = items.filter((item) => {
-        return item.category === kategori;
-    });
-
-    document.getElementById(elementId).textContent = data.length;
-}
-
-/* ==================================================
-   EVENTS
-================================================== */
-
+// ===================================
+// EVENT LISTENERS & INITIALIZATION
+// ===================================
 function setupEventListeners() {
-
     btnTambah.addEventListener("click", addItem);
-
     searchInput.addEventListener("input", renderItems);
 
     sortSelect.addEventListener("change", () => {
-
-        if (sortSelect.value === "nameAsc") {
-            items.sort((a, b) => a.name.localeCompare(b.name));
-        } else if (sortSelect.value === "nameDesc") {
-            items.sort((a, b) => b.name.localeCompare(a.name));
-        } else if (sortSelect.value === "stockAsc") {
-            items.sort((a, b) => a.stock - b.stock);
-        } else if (sortSelect.value === "stockDesc") {
-            items.sort((a, b) => b.stock - a.stock);
-        }
-
+        if (sortSelect.value === "nameAsc") items.sort((a, b) => a.name.localeCompare(b.name));
+        else if (sortSelect.value === "nameDesc") items.sort((a, b) => b.name.localeCompare(a.name));
+        else if (sortSelect.value === "stockAsc") items.sort((a, b) => a.stock - b.stock);
+        else if (sortSelect.value === "stockDesc") items.sort((a, b) => b.stock - a.stock);
         renderItems();
-
     });
 
-    cardStokMenipis.addEventListener("click", bukaStokMenipis);
-    
-    cardBarangHabis.addEventListener("click", bukaBarangHabis);
-    
+    cardStokMenipis.addEventListener("click", () => {
+        dashboardDetail.style.display = "block";
+        dashboardDetailTitle.textContent = "⚠️ Barang Stok Menipis";
+        dashboardDetailList.replaceChildren();
+        items.filter(i => i.stock <= 5).forEach(i => {
+            const li = document.createElement("li");
+            li.textContent = `${i.name} - Stok: ${i.stock}`;
+            dashboardDetailList.appendChild(li);
+        });
+    });
+
+    cardBarangHabis.addEventListener("click", () => {
+        dashboardDetail.style.display = "block";
+        dashboardDetailTitle.textContent = "❌ Barang Habis";
+        dashboardDetailList.replaceChildren();
+        items.filter(i => i.stock === 0).forEach(i => {
+            const li = document.createElement("li");
+            li.textContent = `${i.name} - Stok: ${i.stock}`;
+            dashboardDetailList.appendChild(li);
+        });
+    });
+
     exportButton.addEventListener("click", exportCSV);
-    
-    // dst...
 
+    if (btnScanBarcode) btnScanBarcode.addEventListener("click", openScanner);
+    if (btnCloseScanner) btnCloseScanner.addEventListener("click", closeScanner);
+    if (btnCloseBarcode) btnCloseBarcode.addEventListener("click", () => barcodeModal.classList.remove("show"));
+    if (btnPrintBarcode) btnPrintBarcode.addEventListener("click", () => window.print());
+
+    itemStockInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") addItem();
+    });
 }
 
-/* ==================================================
-   INIT
-================================================== */
-
-function init() {
-
-    loadData();
-
+async function init() {
+    await loadDataSupabase();
     refreshUI();
-
     setupEventListeners();
-
 }
-
-/* ==================================================
-   START APP
-================================================== */
 
 init();

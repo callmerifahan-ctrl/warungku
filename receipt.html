@@ -1,45 +1,28 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
-
-    <title>Struk</title>
-
-    <link
-        rel="stylesheet"
-        href="style.css">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Struk Pembayaran - WarungKu</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="images/logo-warungku.png">
 </head>
-
 <body>
-
     <div class="receipt-container">
-
-        <h1>🛒 WARUNGKU</h1>
-
-        <h2>Toko Ibu Irma</h2>
-
-        <p>Cirebon, Jawa Barat</p>
+        <header class="receipt-header">
+            <h1><img src="images/logo-warungku.png" alt="WarungKu" class="brand-logo"></h1>
+            <h2>Toko Ibu Irma</h2>
+            <p>Cirebon, Jawa Barat</p>
+        </header>
 
         <hr>
 
-        <p>
-            <strong>No Transaksi</strong>
-        </p>
-
-        <p id="receiptCode"></p>
-
-        <p>
-            <strong>Tanggal</strong>
-        </p>
-
-        <p id="receiptDate"></p>
+        <div class="receipt-meta">
+            <p><strong>No Transaksi</strong></p>
+            <p id="receiptCode">-</p>
+            <p><strong>Tanggal</strong></p>
+            <p id="receiptDate">-</p>
+        </div>
 
         <hr>
 
@@ -48,66 +31,29 @@
         <hr>
 
         <div class="receipt-summary">
-
-            <p>
-                Total Item :
-                <span id="receiptTotalItems">0</span>
-            </p>
-
-            <p>
-                Total :
-                <span id="receiptTotal">Rp 0</span>
-            </p>
-
-            <p>
-                Bayar :
-                <span id="receiptPayment">Rp 0</span>
-            </p>
-
-            <p>
-                Kembalian :
-                <span id="receiptChange">Rp 0</span>
-            </p>
-
+            <p><span>Total Item :</span> <span id="receiptTotalItems">0</span></p>
+            <p><span>Total :</span> <span id="receiptTotal">Rp 0</span></p>
+            <p><span>Bayar :</span> <span id="receiptPayment">Rp 0</span></p>
+            <p><span>Kembalian :</span> <span id="receiptChange">Rp 0</span></p>
         </div>
 
         <hr>
 
-            <p class="thanks">
-                Terima Kasih 🙏
-            </p>
-
-            <p class="thanks">
-                Selamat Berbelanja Kembali
-            </p>
-
+        <footer class="receipt-footer">
+            <p class="thanks">Terima Kasih 🙏</p>
+            <p class="thanks">Selamat Berbelanja Kembali</p>
             <hr>
+            <p class="thanks">WarungKu POS</p>
+            <p class="thanks">Version 1.0.0</p>
+        </footer>
 
-            <p class="thanks">
-                WarungKu POS
-            </p>
-
-            <p class="thanks">
-                Version 1.0.0
-            </p>
         <div class="receipt-buttons">
-
-            <button id="printButton">
-
-                🖨 Cetak
-
-            </button>
-
-            <button id="backButton">
-                🛒 Transaksi Baru
-            </button>
-
+            <button id="printButton" class="btn btn-primary">🖨 Cetak</button>
+            <button id="backButton" class="btn btn-secondary">🛒 Transaksi Baru</button>
         </div>
-
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="receipt.js"></script>
-
 </body>
-
 </html>
