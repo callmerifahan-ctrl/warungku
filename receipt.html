@@ -2,9 +2,20 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Struk Transaksi - WarungKu</title>
+    
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="images/logo-warungku.png">
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Meta PWA & iOS Safari -->
+    <meta name="theme-color" content="#e06d53">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="WarungKu">
+    <link rel="apple-touch-icon" href="images/logo.png">
 </head>
 <body>
     <div class="receipt-container">
@@ -35,7 +46,7 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
     <script src="receipt.js"></script>
 </body>
 </html>

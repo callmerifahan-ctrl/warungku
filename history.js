@@ -4,7 +4,6 @@
 const SUPABASE_URL = "https://dyyzsuleugpgiqutebwv.supabase.co";
 const SUPABASE_KEY = "sb_publishable_hKWVFsDZC539-T3nVyS13g_ME3HC0AP";
 
-// Tambahkan opsi auth ini agar Supabase tidak menyentuh Storage browser
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
     auth: {
         persistSession: false,
@@ -23,6 +22,12 @@ function formatRupiah(angka) {
     return "Rp " + Number(angka || 0).toLocaleString("id-ID");
 }
 
+function formatDate(dateString) {
+    if (!dateString) return "-";
+    const parsedDate = new Date(dateString);
+    return isNaN(parsedDate.getTime()) ? "-" : parsedDate.toLocaleString("id-ID");
+}
+
 // ===================================
 // FETCH TRANSACTIONS
 // ===================================
@@ -39,7 +44,7 @@ async function loadTransactionsSupabase() {
 
     transactions = (data || []).map(item => ({
         transactionCode: item.kode_transaksi,
-        date: new Date(item.tanggal).toLocaleString("id-ID"),
+        date: formatDate(item.tanggal),
         items: item.item || [],
         total: item.total,
         payment: item.bayar,
@@ -51,7 +56,6 @@ function createTransactionCard(transaction) {
     const card = document.createElement("div");
     card.className = "transaction-card";
 
-    // TAMBAHKAN PARAMETER source=history
     card.addEventListener("click", () => {
         window.location.href = `transaction-detail.html?id=${encodeURIComponent(transaction.transactionCode)}&source=history`;
     });
@@ -89,31 +93,6 @@ function renderTransactions() {
     transactions.forEach((transaction) => {
         transactionList.appendChild(createTransactionCard(transaction));
     });
-}
-
-function createTransactionCard(transaction) {
-    const card = document.createElement("div");
-    card.className = "transaction-card";
-
-    card.addEventListener("click", () => {
-        window.location.href = `transaction-detail.html?id=${transaction.transactionCode}&source=history`;
-    });
-
-    const code = document.createElement("h2");
-    code.textContent = transaction.transactionCode;
-
-    const date = document.createElement("p");
-    date.textContent = transaction.date;
-
-    const total = document.createElement("h3");
-    total.textContent = formatRupiah(transaction.total);
-
-    const itemCount = document.createElement("small");
-    const totalQty = transaction.items.reduce((sum, item) => sum + item.qty, 0);
-    itemCount.textContent = `${transaction.items.length} produk • ${totalQty} item`;
-
-    card.append(code, date, total, itemCount);
-    return card;
 }
 
 // ===================================

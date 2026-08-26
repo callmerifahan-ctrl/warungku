@@ -1,14 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>WarungKu</title>
+    <title>WarungKu - Inventori</title>
     
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/png" href="images/logo-warungku.png">
     <link rel="manifest" href="manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
 
     <!-- Meta PWA & iOS Safari -->
     <meta name="theme-color" content="#e06d53">
@@ -16,7 +15,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="WarungKu">
-    <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="images/logo.png">
 </head>
 <body>
@@ -30,126 +28,75 @@
         </div>
 
         <nav class="main-nav">
-
-            <a href="index.html" class="nav-link active">
-                📦 Inventori
-            </a>
-
-            <a href="cashier.html" class="nav-link">
-                🛒 Kasir
-            </a>
-
-            <a href="history.html" class="nav-link">
-                📋 Riwayat Transaksi
-            </a>
-
-            <a href="report.html" class="nav-link">
-                📊 Laporan
-            </a>
-
+            <a href="index.html" class="nav-link active">📦 Inventori</a>
+            <a href="cashier.html" class="nav-link">🛒 Kasir</a>
+            <a href="history.html" class="nav-link">📋 Riwayat Transaksi</a>
+            <a href="report.html" class="nav-link">📊 Laporan</a>
         </nav>
 
         <div class="dashboard-box">
-
             <div class="dashboard-card">
                 <h3>📦</h3>
                 <h2 id="dashboardTotalBarang">0</h2>
                 <p>Total Barang</p>
             </div>
-
             <div class="dashboard-card">
                 <h3>📚</h3>
                 <h2 id="dashboardTotalStok">0</h2>
                 <p>Total Stok</p>
             </div>
-
             <div id="cardStokMenipis" class="dashboard-card">
                 <h3>⚠️</h3>
                 <h2 id="dashboardStokMenipis">0</h2>
                 <p>Stok Menipis</p>
             </div>
-
             <div id="cardBarangHabis" class="dashboard-card">
                 <h3>❌</h3>
                 <h2 id="dashboardBarangHabis">0</h2>
                 <p>Barang Habis</p>
             </div>
-
         </div>
 
         <div id="dashboardDetail" class="dashboard-detail">
-
             <h3 id="dashboardDetailTitle"></h3>
-
             <ul id="dashboardDetailList"></ul>
-
         </div>
 
         <div class="form-box">
-
-            <input type="text"
-                   id="itemName"
-                   placeholder="Nama Barang">
-
-            <input type="number"
-                   id="itemStock"
-                   placeholder="Jumlah Stok">
+            <input type="text" id="itemName" placeholder="Nama Barang">
+            <input type="number" id="itemStock" placeholder="Jumlah Stok">
 
             <label for="buyPrice">Harga Modal</label>
+            <input type="number" id="buyPrice" placeholder="Harga Modal">
 
-                <input
-                    type="number"
-                    id="buyPrice"
-                    placeholder="Harga Modal">
-
-                <label for="sellPrice">Harga Jual</label>
-
-                <input
-                    type="number"
-                    id="sellPrice"
-                    placeholder="Harga Jual">
+            <label for="sellPrice">Harga Jual</label>
+            <input type="number" id="sellPrice" placeholder="Harga Jual">
 
             <label for="category">Kategori</label>
-
-                <select id="category">
-                    <option value="Minuman">🥤 Minuman</option>
-                    <option value="Makanan">🍜 Makanan</option>
-                    <option value="Snack">🍪 Snack</option>
-                    <option value="Bumbu">🧂 Bumbu</option>
-                    <option value="Kebersihan">🧼 Kebersihan</option>
-                    <option value="Perawatan">🧴 Perawatan</option>
-                    <option value="ATK">✏️ ATK</option>
-                </select>
+            <select id="category">
+                <option value="Minuman">🥤 Minuman</option>
+                <option value="Makanan">🍜 Makanan</option>
+                <option value="Snack">🍪 Snack</option>
+                <option value="Bumbu">🧂 Bumbu</option>
+                <option value="Kebersihan">🧼 Kebersihan</option>
+                <option value="Perawatan">🧴 Perawatan</option>
+                <option value="ATK">✏️ ATK</option>
+            </select>
 
             <div class="barcode-row">
-                <input
-                    type="text"
-                    id="scannedBarcode"
-                    placeholder="Barcode (opsional, scan atau kosongkan)"
-                    readonly>
-
-                <button type="button" id="btnScanBarcode" class="btn btn-secondary">
-                    📷 Scan
-                </button>
+                <input type="text" id="scannedBarcode" placeholder="Barcode (opsional, scan atau kosongkan)" readonly>
+                <button type="button" id="btnScanBarcode" class="btn btn-secondary">📷 Scan</button>
             </div>
 
-            <button id="btnTambah" class="btn btn-primary">
-                    Tambah Barang
-                </button>
-
-                <button id="exportButton" class="btn btn-secondary">
-                    📄 Export CSV
-                </button>
-
+            <button id="btnTambah" class="btn btn-primary">Tambah Barang</button>
+            <button id="exportButton" class="btn btn-secondary">📄 Export CSV</button>
         </div>
 
         <div id="scannerModal" class="scanner-modal">
             <div class="scanner-box">
                 <h3>📷 Arahkan kamera ke barcode</h3>
                 <div id="scannerReader"></div>
-                <button type="button" id="btnCloseScanner" class="btn btn-secondary">
-                    Batal
-                </button>
+                <button type="button" id="btnCloseScanner" class="btn btn-secondary">Batal</button>
             </div>
         </div>
 
@@ -159,20 +106,14 @@
                 <svg id="barcodeSvg"></svg>
                 <p id="barcodeItemPrice" class="label-price"></p>
                 <div class="barcode-modal-buttons">
-                    <button type="button" id="btnPrintBarcode" class="btn btn-primary">
-                        🖨 Cetak
-                    </button>
-                    <button type="button" id="btnCloseBarcode" class="btn btn-secondary">
-                        Tutup
-                    </button>
+                    <button type="button" id="btnPrintBarcode" class="btn btn-primary">🖨 Cetak</button>
+                    <button type="button" id="btnCloseBarcode" class="btn btn-secondary">Tutup</button>
                 </div>
             </div>
         </div>
 
         <div class="sort-box">
-
             <label for="sortSelect">Urutkan:</label>
-
             <select id="sortSelect">
                 <option value="default">Default</option>
                 <option value="nameAsc">Nama A-Z</option>
@@ -182,38 +123,23 @@
             </select>
 
             <label for="searchInput">🔍 Cari Barang:</label>
-                <input
-                    type="text"
-                    id="searchInput"
-                    placeholder="Cari nama barang..."
-                >
-
+            <input type="text" id="searchInput" placeholder="Cari nama barang...">
         </div>        
 
         <div class="list-box">
-
             <h2>📦 Daftar Barang</h2>
-
-                <p id="totalItems">
-                    Total Barang : 0
-                </p>          
-
+            <p id="totalItems">Total Barang : 0</p>          
             <ul id="itemList"></ul>
-
         </div>
 
-    <div class="stats-container"
-        
-        id="categoryContainer">
-
+        <div class="stats-container" id="categoryContainer"></div>
     </div>
 
     <div id="toast" class="toast"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js" crossorigin="anonymous"></script>
     <script src="script.js"></script>
-
 </body>
 </html>

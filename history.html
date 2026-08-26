@@ -7,6 +7,7 @@
     
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/png" href="images/logo-warungku.png">
+    <link rel="manifest" href="manifest.json">
 
     <!-- Meta PWA & iOS Safari -->
     <meta name="theme-color" content="#e06d53">
@@ -18,7 +19,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🧾 Riwayat Transaksi</h1>
+        <h1>📋 Riwayat Transaksi</h1>
 
         <nav class="main-nav">
             <a href="index.html" class="nav-link">📦 Inventori</a>
@@ -30,7 +31,7 @@
         <main id="transactionList"></main>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
     <script src="history.js"></script>
 </body>
 </html>
