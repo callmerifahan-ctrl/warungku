@@ -13,18 +13,8 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, 
 });
 
 // ===================================
-// DOM ELEMENTS & UTILITIES
+// UTILITIES
 // ===================================
-const receiptDate = document.getElementById("receiptDate");
-const receiptCode = document.getElementById("receiptCode");
-const receiptItems = document.getElementById("receiptItems");
-const receiptTotal = document.getElementById("receiptTotal");
-const receiptPayment = document.getElementById("receiptPayment");
-const receiptChange = document.getElementById("receiptChange");
-
-const btnPrint = document.getElementById("btnPrint");
-const btnBack = document.getElementById("btnBack");
-
 function formatRupiah(angka) {
     return "Rp " + Number(angka || 0).toLocaleString("id-ID");
 }
@@ -48,6 +38,13 @@ async function loadReceipt() {
     const urlParams = new URLSearchParams(window.location.search);
     const trxCode = urlParams.get("id");
 
+    const receiptDate = document.getElementById("receiptDate");
+    const receiptCode = document.getElementById("receiptCode");
+    const receiptItems = document.getElementById("receiptItems");
+    const receiptTotal = document.getElementById("receiptTotal");
+    const receiptPayment = document.getElementById("receiptPayment");
+    const receiptChange = document.getElementById("receiptChange");
+
     if (!trxCode) {
         alert("Kode transaksi tidak ditemukan!");
         window.location.href = "history.html";
@@ -67,40 +64,51 @@ async function loadReceipt() {
         return;
     }
 
-    receiptCode.textContent = data.kode_transaksi;
-    receiptDate.textContent = formatDate(data.created_at);
-    receiptTotal.textContent = formatRupiah(data.total);
-    receiptPayment.textContent = formatRupiah(data.bayar);
-    receiptChange.textContent = formatRupiah(data.kembalian);
+    if (receiptCode) receiptCode.textContent = data.kode_transaksi;
+    if (receiptDate) receiptDate.textContent = formatDate(data.created_at);
+    if (receiptTotal) receiptTotal.textContent = formatRupiah(data.total);
+    if (receiptPayment) receiptPayment.textContent = formatRupiah(data.bayar);
+    if (receiptChange) receiptChange.textContent = formatRupiah(data.kembalian);
 
-    receiptItems.replaceChildren();
-    const items = Array.isArray(data.item) ? data.item : [];
-    items.forEach(item => {
-        const itemRow = document.createElement("div");
-        itemRow.style.display = "flex";
-        itemRow.style.justifyContent = "space-between";
-        itemRow.style.margin = "6px 0";
+    if (receiptItems) {
+        receiptItems.replaceChildren();
+        const items = Array.isArray(data.item) ? data.item : [];
+        items.forEach(item => {
+            const itemRow = document.createElement("div");
+            itemRow.style.display = "flex";
+            itemRow.style.justifyContent = "space-between";
+            itemRow.style.margin = "6px 0";
 
-        const titleSpan = document.createElement("span");
-        titleSpan.textContent = `${item.name} x${item.qty}`;
+            const titleSpan = document.createElement("span");
+            titleSpan.textContent = `${item.name} x${item.qty}`;
 
-        const priceSpan = document.createElement("span");
-        priceSpan.textContent = formatRupiah(item.price * item.qty);
+            const priceSpan = document.createElement("span");
+            priceSpan.textContent = formatRupiah(item.price * item.qty);
 
-        itemRow.append(titleSpan, priceSpan);
-        receiptItems.appendChild(itemRow);
-    });
+            itemRow.append(titleSpan, priceSpan);
+            receiptItems.appendChild(itemRow);
+        });
+    }
 }
 
 // ===================================
-// EVENT LISTENERS
+// INITIALIZATION & EVENT LISTENERS
 // ===================================
-btnPrint.addEventListener("click", () => {
-    window.print();
-});
+document.addEventListener("DOMContentLoaded", () => {
+    const btnPrint = document.getElementById("btnPrint");
+    const btnBack = document.getElementById("btnBack");
 
-btnBack.addEventListener("click", () => {
-    window.location.href = "cashier.html";
-});
+    if (btnPrint) {
+        btnPrint.addEventListener("click", () => {
+            window.print();
+        });
+    }
 
-loadReceipt();
+    if (btnBack) {
+        btnBack.addEventListener("click", () => {
+            window.location.href = "cashier.html";
+        });
+    }
+
+    loadReceipt();
+});
