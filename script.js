@@ -402,9 +402,16 @@ function renderCategoryCards() {
 function openScanner() {
     scannerModal.classList.add("show");
     html5QrCode = new Html5Qrcode("scannerReader");
+    
+    // Konfigurasi bingkai memanjang khusus Barcode Garis (1D)
+    const config = { 
+        fps: 10, 
+        qrbox: { width: 260, height: 130 } 
+    };
+
     html5QrCode.start(
         { facingMode: "environment" },
-        { fps: 10, qrbox: 220 },
+        config,
         (decodedText) => {
             scannedBarcodeInput.value = decodedText;
             showToast(`Barcode terdeteksi: ${decodedText}`);

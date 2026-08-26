@@ -535,3 +535,17 @@ button:hover, .btn:hover {
         align-items: flex-start;
     }
 }
+
+/* Tampilan Kotak Kamera Scanner */
+#reader {
+    width: 100%;
+    max-width: 350px;
+    margin: 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Mengubah efek garis fokus scanner agar merah melintang */
+#reader __scan_region__ {
+    border: 2px solid #e06d53 !important;
+}
