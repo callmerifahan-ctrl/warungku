@@ -1,4 +1,4 @@
-const CACHE_NAME = "warungku-v1";
+const CACHE_NAME = "warungku-v2";
 const urlsToCache = [
   "./",
   "./index.html",
@@ -14,7 +14,8 @@ const urlsToCache = [
   "./transaction-detail.js",
   "./receipt.js",
   "./report.js",
-  "./manifest.json"
+  "./manifest.json",
+  "./images/logo.png"
 ];
 
 // Install Service Worker & Cache Assets
@@ -26,7 +27,7 @@ self.addEventListener("install", (event) => {
   );
 });
 
-// Fetch Assets from Cache / Network
+// Fetch Assets
 self.addEventListener("fetch", (event) => {
   event.respondWith(
     caches.match(event.request).then((response) => {
