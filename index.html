@@ -17,9 +17,7 @@
     <link rel="apple-touch-icon" href="image/logo-warungku.png">
 </head>
 <body>
-
     <div class="container">
-
         <!-- Header Logo -->
         <div class="header-logo" style="text-align: center; margin-bottom: 20px;">
             <img src="image/logo-warungku.png" alt="WarungKu Logo" class="brand-logo">
@@ -33,113 +31,91 @@
             <a href="report.html" class="nav-link">📊 Laporan</a>
         </nav>
 
-        <div class="dashboard-box">
-            <div class="dashboard-card">
-                <h3>📦</h3>
-                <h2 id="dashboardTotalBarang">0</h2>
-                <p>Total Barang</p>
-            </div>
-            <div class="dashboard-card">
-                <h3>📚</h3>
-                <h2 id="dashboardTotalStok">0</h2>
-                <p>Total Stok</p>
-            </div>
-            <div id="cardStokMenipis" class="dashboard-card">
-                <h3>⚠️</h3>
-                <h2 id="dashboardStokMenipis">0</h2>
-                <p>Stok Menipis</p>
-            </div>
-            <div id="cardBarangHabis" class="dashboard-card">
-                <h3>❌</h3>
-                <h2 id="dashboardBarangHabis">0</h2>
-                <p>Barang Habis</p>
-            </div>
+        <!-- Tombol Quick Scan / Foto Barang -->
+        <div class="card" style="margin-bottom: 20px; text-align: center;">
+            <label for="cameraInput" class="btn btn-primary" style="display: inline-block; cursor: pointer; width: 100%; box-sizing: border-box; font-weight: bold;">
+                📷 Ambil Foto / Scan Barang
+            </label>
+            <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;">
         </div>
 
-        <div id="dashboardDetail" class="dashboard-detail">
-            <h3 id="dashboardDetailTitle"></h3>
-            <ul id="dashboardDetailList"></ul>
-        </div>
-
+        <!-- Form Tambah / Edit Barang -->
         <div class="form-box">
-            <input type="text" id="itemName" placeholder="Nama Barang">
-            <input type="number" id="itemStock" placeholder="Jumlah Stok">
+            <h2 id="formTitle">➕ Tambah Barang Baru</h2>
+            <form id="itemForm">
+                <input type="hidden" id="itemId">
+                <input type="hidden" id="itemImageUrl">
 
-            <label for="buyPrice">Harga Modal</label>
-            <input type="number" id="buyPrice" placeholder="Harga Modal">
-
-            <label for="sellPrice">Harga Jual</label>
-            <input type="number" id="sellPrice" placeholder="Harga Jual">
-
-            <label for="category">Kategori</label>
-            <select id="category">
-                <option value="Minuman">🥤 Minuman</option>
-                <option value="Makanan">🍜 Makanan</option>
-                <option value="Snack">🍪 Snack</option>
-                <option value="Bumbu">🧂 Bumbu</option>
-                <option value="Kebersihan">🧼 Kebersihan</option>
-                <option value="Perawatan">🧴 Perawatan</option>
-                <option value="ATK">✏️ ATK</option>
-            </select>
-
-            <div class="barcode-row">
-                <input type="text" id="scannedBarcode" placeholder="Barcode (opsional, scan atau kosongkan)" readonly>
-                <button type="button" id="btnScanBarcode" class="btn btn-secondary">📷 Scan</button>
-            </div>
-
-            <button id="btnTambah" class="btn btn-primary">Tambah Barang</button>
-            <button id="exportButton" class="btn btn-secondary">📄 Export CSV</button>
-        </div>
-
-        <div id="scannerModal" class="scanner-modal">
-            <div class="scanner-box">
-                <h3>📷 Arahkan kamera ke barcode</h3>
-                <div id="scannerReader"></div>
-                <button type="button" id="btnCloseScanner" class="btn btn-secondary">Batal</button>
-            </div>
-        </div>
-
-        <div id="barcodeModal" class="scanner-modal">
-            <div class="scanner-box barcode-label-box" id="barcodeLabelPrintArea">
-                <p id="barcodeItemName" class="label-name"></p>
-                <svg id="barcodeSvg"></svg>
-                <p id="barcodeItemPrice" class="label-price"></p>
-                <div class="barcode-modal-buttons">
-                    <button type="button" id="btnPrintBarcode" class="btn btn-primary">🖨 Cetak</button>
-                    <button type="button" id="btnCloseBarcode" class="btn btn-secondary">Tutup</button>
+                <div class="form-group">
+                    <label for="namaBarang">Nama Barang / Rempah:</label>
+                    <input type="text" id="namaBarang" required placeholder="Contoh: Bawang Merah 100g">
                 </div>
-            </div>
+
+                <div class="form-group">
+                    <label for="stokBarang">Stok (Jumlah):</label>
+                    <input type="number" id="stokBarang" min="0" required placeholder="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="hargaBeli">Harga Beli / Modal (Rp):</label>
+                    <input type="number" id="hargaBeli" min="0" required placeholder="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="hargaJual">Harga Jual (Rp):</label>
+                    <input type="number" id="hargaJual" min="0" required placeholder="0">
+                </div>
+
+                <div class="form-actions" style="display: flex; gap: 10px;">
+                    <button type="submit" id="btnSubmit" class="btn btn-primary" style="flex: 1;">Simpan Barang</button>
+                    <button type="button" id="btnCancel" class="btn btn-secondary" style="display: none;">Batal</button>
+                </div>
+            </form>
         </div>
 
-        <div class="sort-box">
-            <label for="sortSelect">Urutkan:</label>
-            <select id="sortSelect">
-                <option value="default">Default</option>
-                <option value="nameAsc">Nama A-Z</option>
-                <option value="nameDesc">Nama Z-A</option>
-                <option value="stockAsc">Stok Tersedikit</option>
-                <option value="stockDesc">Stok Terbanyak</option>
-            </select>
-
+        <div class="sort-box" style="margin-top: 20px;">
             <label for="searchInput">🔍 Cari Barang:</label>
-            <input type="text" id="searchInput" placeholder="Cari nama barang...">
-        </div>        
+            <input type="text" id="searchInput" placeholder="Ketik nama barang...">
+        </div>
 
         <div class="list-box">
-            <h2>📦 Daftar Barang</h2>
-            <p id="totalItems">Total Barang : 0</p>          
-            <ul id="itemList"></ul>
+            <h2>📦 Daftar Stok Barang</h2>
+            <div id="itemList"></div>
         </div>
+    </div>
 
-        <div class="stats-container" id="categoryContainer"></div>
+    <!-- Modal Pilihan Setelah Foto -->
+    <div id="photoOptionModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center;">
+        <div style="background: white; padding: 20px; border-radius: 12px; max-width: 400px; width: 90%; text-align: center;">
+            <h3 style="margin-top: 0;">Foto Berhasil Diambil</h3>
+            <p style="color: var(--text-muted); font-size: 14px;">Pilih tindakan untuk foto barang ini:</p>
+            
+            <div id="modalPreviewBox" style="margin: 15px 0;">
+                <img id="modalImagePreview" src="" alt="Preview" style="max-width: 100%; max-height: 150px; border-radius: 8px;">
+            </div>
+
+            <button id="btnOptionNew" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">➕ Tambah Barang Baru</button>
+            <button id="btnOptionExisting" class="btn btn-secondary" style="width: 100%; margin-bottom: 10px;">📦 Tambah ke Barang yang Sudah Ada</button>
+            <button id="btnOptionCancel" class="btn" style="width: 100%; background: #ccc;">Batal</button>
+
+            <!-- Sub Form untuk Update Stok Barang Lama -->
+            <div id="existingProductForm" style="display: none; margin-top: 15px; text-align: left; border-top: 1px solid #ddd; padding-top: 15px;">
+                <div class="form-group">
+                    <label for="selectExistingItem">Pilih Barang:</label>
+                    <select id="selectExistingItem" style="width: 100%; padding: 8px; border-radius: 6px;"></select>
+                </div>
+                <div class="form-group">
+                    <label for="addQtyInput">Jumlah Stok yang Ditambahkan:</label>
+                    <input type="number" id="addQtyInput" min="1" value="1" style="width: 100%; padding: 8px; border-radius: 6px;">
+                </div>
+                <button id="btnSubmitAddStock" class="btn btn-primary" style="width: 100%;">Update Stok</button>
+            </div>
+        </div>
     </div>
 
     <div id="toast" class="toast"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js" crossorigin="anonymous"></script>
-    <script src="script.js"></script>
-    
+    <script src="index.js"></script>
 </body>
 </html>

@@ -13,68 +13,48 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, 
 });
 
 // ===================================
-// DATA & DOM
+// DATA STATE & DOM ELEMENTS
 // ===================================
 let transactions = [];
 const transactionList = document.getElementById("transactionList");
+const searchInput = document.getElementById("searchInput");
 
+// ===================================
+// UTILITIES
+// ===================================
 function formatRupiah(angka) {
     return "Rp " + Number(angka || 0).toLocaleString("id-ID");
 }
 
 function formatDate(dateString) {
     if (!dateString) return "-";
-    const parsedDate = new Date(dateString);
-    return isNaN(parsedDate.getTime()) ? "-" : parsedDate.toLocaleString("id-ID");
+    const date = new Date(dateString);
+    return date.toLocaleString("id-ID", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
 }
 
 // ===================================
-// FETCH TRANSACTIONS
+// DATABASE OPERATIONS
 // ===================================
-async function loadTransactionsSupabase() {
+async function loadTransactions() {
     const { data, error } = await supabaseClient
         .from("transaksi")
         .select("*")
-        .order("tanggal", { ascending: false });
+        .order("created_at", { ascending: false });
 
     if (error) {
-        console.error("Error fetching transactions:", error);
+        console.error("Error loading transactions:", error);
+        alert("Gagal memuat riwayat transaksi!");
         return;
     }
 
-    transactions = (data || []).map(item => ({
-        transactionCode: item.kode_transaksi,
-        date: formatDate(item.tanggal),
-        items: item.item || [],
-        total: item.total,
-        payment: item.bayar,
-        change: item.kembalian
-    }));
-}
-
-function createTransactionCard(transaction) {
-    const card = document.createElement("div");
-    card.className = "transaction-card";
-
-    card.addEventListener("click", () => {
-        window.location.href = `transaction-detail.html?id=${encodeURIComponent(transaction.transactionCode)}&source=history`;
-    });
-
-    const code = document.createElement("h2");
-    code.textContent = transaction.transactionCode;
-
-    const date = document.createElement("p");
-    date.textContent = transaction.date;
-
-    const total = document.createElement("h3");
-    total.textContent = formatRupiah(transaction.total);
-
-    const itemCount = document.createElement("small");
-    const totalQty = (transaction.items || []).reduce((sum, item) => sum + item.qty, 0);
-    itemCount.textContent = `${transaction.items ? transaction.items.length : 0} produk • ${totalQty} item`;
-
-    card.append(code, date, total, itemCount);
-    return card;
+    transactions = data || [];
+    renderTransactions();
 }
 
 // ===================================
@@ -82,25 +62,84 @@ function createTransactionCard(transaction) {
 // ===================================
 function renderTransactions() {
     transactionList.replaceChildren();
+    const keyword = searchInput ? searchInput.value.toLowerCase().trim() : "";
 
-    if (transactions.length === 0) {
-        const empty = document.createElement("p");
-        empty.textContent = "Belum ada transaksi.";
-        transactionList.appendChild(empty);
+    const filtered = transactions.filter(trx => 
+        (trx.kode_transaksi || "").toLowerCase().includes(keyword)
+    );
+
+    if (filtered.length === 0) {
+        const emptyMsg = document.createElement("p");
+        emptyMsg.style.textAlign = "center";
+        emptyMsg.style.color = "var(--text-muted)";
+        emptyMsg.textContent = "Tidak ada riwayat transaksi.";
+        transactionList.appendChild(emptyMsg);
         return;
     }
 
-    transactions.forEach((transaction) => {
-        transactionList.appendChild(createTransactionCard(transaction));
+    filtered.forEach(trx => {
+        const card = createTransactionCard(trx);
+        transactionList.appendChild(card);
     });
 }
 
+function createTransactionCard(trx) {
+    const card = document.createElement("div");
+    card.className = "transaction-card";
+    
+    // Redirect ke halaman detail / receipt saat diklik
+    card.addEventListener("click", () => {
+        window.location.href = `receipt.html?id=${trx.kode_transaksi}`;
+    });
+
+    const headerRow = document.createElement("div");
+    headerRow.style.display = "flex";
+    headerRow.style.justifyContent = "space-between";
+    headerRow.style.alignItems = "center";
+
+    const title = document.createElement("h3");
+    title.style.margin = "0";
+    title.textContent = trx.kode_transaksi;
+
+    const date = document.createElement("small");
+    date.style.color = "var(--text-muted)";
+    date.textContent = formatDate(trx.created_at);
+
+    headerRow.append(title, date);
+
+    const itemsUl = document.createElement("ul");
+    itemsUl.style.margin = "10px 0";
+    itemsUl.style.paddingLeft = "20px";
+
+    const items = Array.isArray(trx.item) ? trx.item : [];
+    items.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = `${item.name} (${item.qty}x) - ${formatRupiah(item.price * item.qty)}`;
+        itemsUl.appendChild(li);
+    });
+
+    const total = document.createElement("p");
+    total.style.margin = "8px 0 0";
+    total.style.fontWeight = "bold";
+    total.style.color = "var(--primary)";
+    total.textContent = `Total: ${formatRupiah(trx.total)}`;
+
+    card.append(headerRow, itemsUl, total);
+    return card;
+}
+
 // ===================================
-// INIT
+// INITIALIZATION
 // ===================================
+function setupEventListeners() {
+    if (searchInput) {
+        searchInput.addEventListener("input", renderTransactions);
+    }
+}
+
 async function init() {
-    await loadTransactionsSupabase();
-    renderTransactions();
+    await loadTransactions();
+    setupEventListeners();
 }
 
 init();

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Struk Transaksi - WarungKu</title>
+    <title>WarungKu - Struk Pembayaran</title>
     
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/png" href="image/logo-warungku.png">
@@ -18,30 +18,34 @@
 </head>
 <body>
     <div class="receipt-container">
-        <!-- Logo Struk -->
-        <div class="receipt-header" style="text-align: center; margin-bottom: 15px;">
-            <img src="images/logo.png" alt="WarungKu Logo" style="width: 70px; height: 70px; object-fit: contain;">
+        <div class="receipt-header">
+            <img src="image/logo-warungku.png" alt="WarungKu Logo" class="brand-logo">
             <h2>WarungKu</h2>
-            <p>Toko Kelontong</p>
+            <p id="receiptDate" style="color: var(--text-muted); font-size: 13px; margin: 4px 0;"></p>
+            <p id="receiptCode" style="font-weight: bold; margin: 4px 0;"></p>
         </div>
 
         <hr>
 
-        <!-- Detail Struk -->
-        <div id="receiptDetail">
-            <p>Kode Transaksi: <span id="receiptCode">-</span></p>
-            <p>Tanggal: <span id="receiptDate">-</span></p>
-            <hr>
-            <div id="receiptItems"></div>
-            <hr>
-            <p>Total: <strong id="receiptTotal">Rp 0</strong></p>
-            <p>Bayar: <span id="receiptPayment">Rp 0</span></p>
-            <p>Kembali: <span id="receiptChange">Rp 0</span></p>
+        <div id="receiptItems"></div>
+
+        <hr>
+
+        <div class="receipt-summary">
+            <p><span>Total</span> <strong id="receiptTotal">Rp 0</strong></p>
+            <p><span>Bayar</span> <span id="receiptPayment">Rp 0</span></p>
+            <p><span>Kembali</span> <span id="receiptChange">Rp 0</span></p>
         </div>
 
-        <div class="receipt-actions" style="margin-top: 20px; text-align: center;">
-            <button onclick="window.print()">🖨️ Cetak Struk</button>
-            <button onclick="window.location.href='cashier.html'">⬅ Kembali ke Kasir</button>
+        <hr>
+
+        <div class="receipt-footer">
+            <p>Terima kasih atas kunjungan Anda!</p>
+        </div>
+
+        <div class="receipt-buttons">
+            <button type="button" id="btnPrint" class="btn btn-primary">🖨️ Cetak / Simpan</button>
+            <button type="button" id="btnBack" class="btn btn-secondary">Kembali</button>
         </div>
     </div>
 

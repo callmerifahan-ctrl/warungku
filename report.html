@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>WarungKu - Laporan Penjualan</title>
+    <title>WarungKu - Laporan</title>
     
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/png" href="image/logo-warungku.png">
-
+    
     <!-- Meta PWA & iOS -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#D67A67">
@@ -18,7 +18,11 @@
 </head>
 <body>
     <div class="container">
-        <h1>📊 Laporan Penjualan</h1>
+        <!-- Header Logo -->
+        <div class="header-logo" style="text-align: center; margin-bottom: 20px;">
+            <img src="image/logo-warungku.png" alt="WarungKu Logo" class="brand-logo">
+            <h1>WarungKu</h1>
+        </div>
 
         <nav class="main-nav">
             <a href="index.html" class="nav-link">📦 Inventori</a>
@@ -27,29 +31,33 @@
             <a href="report.html" class="nav-link active">📊 Laporan</a>
         </nav>
 
-        <section class="dashboard">
-            <div class="stat-card">
-                <p>Total Pendapatan</p>
-                <h2 id="totalRevenue">Rp 0</h2>
+        <div class="dashboard-box">
+            <div class="dashboard-card">
+                <h3>💰</h3>
+                <h2 id="reportOmzet">Rp 0</h2>
+                <p>Total Omzet</p>
             </div>
-            <div class="stat-card">
+            <div class="dashboard-card">
+                <h3>📈</h3>
+                <h2 id="reportKeuntungan">Rp 0</h2>
+                <p>Estimasi Keuntungan</p>
+            </div>
+            <div class="dashboard-card">
+                <h3>🛒</h3>
+                <h2 id="reportTotalTransaksi">0</h2>
                 <p>Total Transaksi</p>
-                <h2 id="totalTransactions">0</h2>
             </div>
-            <div class="stat-card">
-                <p>Barang Terjual</p>
-                <h2 id="totalItemsSold">0</h2>
+            <div class="dashboard-card">
+                <h3>📦</h3>
+                <h2 id="reportTerjual">0</h2>
+                <p>Total Item Terjual</p>
             </div>
-            <div class="stat-card">
-                <p>Produk Terlaris</p>
-                <h2 id="bestSeller">-</h2>
-            </div>
-        </section>
+        </div>
 
-        <section class="report-box">
-            <h2>📋 Riwayat Ringkas</h2>
-            <div id="reportList"></div>
-        </section>
+        <div class="report-box">
+            <h2>🏆 Produk Terlaris</h2>
+            <ul id="topProductsList" style="padding-left: 20px;"></ul>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
