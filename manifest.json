@@ -1,22 +1,23 @@
 {
-  "name": "WarungKu - Kasir",
   "short_name": "WarungKu",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#007bff",
+  "name": "WarungKu POS",
   "icons": [
     {
-      "src": "images/logo.png",
-      "sizes": "192x192",
+      "src": "image/logo-warungku.png",
       "type": "image/png",
+      "sizes": "192x192",
       "purpose": "any"
     },
     {
-      "src": "images/logo.png",
-      "sizes": "512x512",
+      "src": "image/logo-warungku.png",
       "type": "image/png",
+      "sizes": "512x512",
       "purpose": "any"
     }
-  ]
+  ],
+  "start_url": "./index.html",
+  "background_color": "#ffffff",
+  "theme_color": "#D67A67",
+  "display": "standalone",
+  "orientation": "portrait"
 }

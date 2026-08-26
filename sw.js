@@ -1,4 +1,5 @@
-const CACHE_NAME = "warungku-v2";
+const CACHE_NAME = "warungku-v4";
+
 const urlsToCache = [
   "./",
   "./index.html",
@@ -15,7 +16,7 @@ const urlsToCache = [
   "./receipt.js",
   "./report.js",
   "./manifest.json",
-  "./images/logo.png"
+  "./image/logo-warungku.png"
 ];
 
 // Install Service Worker & Cache Assets
@@ -28,7 +29,7 @@ self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
 
-// Activate & Clear Old Cache
+// Activate & Hapus Cache Lama
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -44,7 +45,7 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Fetch Assets (Lewati pencarian cache jika request menuju Supabase)
+// Fetch Assets
 self.addEventListener("fetch", (event) => {
   if (event.request.url.includes("supabase.co")) {
     return;
