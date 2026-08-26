@@ -51,64 +51,49 @@ async function loadReceipt() {
         return;
     }
 
-    const { data, error } = await supabaseClient
-        .from("transaksi")
-        .select("*")
-        .eq("kode_transaksi", trxCode)
-        .single();
+    try {
+        const { data, error } = await supabaseClient
+            .from("transaksi")
+            .select("*")
+            .eq("kode_transaksi", trxCode)
+            .single();
 
-    if (error || !data) {
-        console.error(error);
-        alert("Transaksi tidak ditemukan!");
-        window.location.href = "history.html";
-        return;
-    }
+        if (error || !data) {
+            console.error(error);
+            alert("Transaksi tidak ditemukan!");
+            window.location.href = "history.html";
+            return;
+        }
 
-    if (receiptCode) receiptCode.textContent = data.kode_transaksi;
-    if (receiptDate) receiptDate.textContent = formatDate(data.created_at);
-    if (receiptTotal) receiptTotal.textContent = formatRupiah(data.total);
-    if (receiptPayment) receiptPayment.textContent = formatRupiah(data.bayar);
-    if (receiptChange) receiptChange.textContent = formatRupiah(data.kembalian);
+        if (receiptCode) receiptCode.textContent = data.kode_transaksi;
+        if (receiptDate) receiptDate.textContent = formatDate(data.created_at);
+        if (receiptTotal) receiptTotal.textContent = formatRupiah(data.total);
+        if (receiptPayment) receiptPayment.textContent = formatRupiah(data.bayar);
+        if (receiptChange) receiptChange.textContent = formatRupiah(data.kembalian);
 
-    if (receiptItems) {
-        receiptItems.replaceChildren();
-        const items = Array.isArray(data.item) ? data.item : [];
-        items.forEach(item => {
-            const itemRow = document.createElement("div");
-            itemRow.style.display = "flex";
-            itemRow.style.justifyContent = "space-between";
-            itemRow.style.margin = "6px 0";
+        if (receiptItems) {
+            receiptItems.replaceChildren();
+            const items = Array.isArray(data.item) ? data.item : [];
+            items.forEach(item => {
+                const itemRow = document.createElement("div");
+                itemRow.style.display = "flex";
+                itemRow.style.justifyContent = "space-between";
+                itemRow.style.margin = "6px 0";
 
-            const titleSpan = document.createElement("span");
-            titleSpan.textContent = `${item.name} x${item.qty}`;
+                const titleSpan = document.createElement("span");
+                titleSpan.textContent = `${item.name} x${item.qty}`;
 
-            const priceSpan = document.createElement("span");
-            priceSpan.textContent = formatRupiah(item.price * item.qty);
+                const priceSpan = document.createElement("span");
+                priceSpan.textContent = formatRupiah(item.price * item.qty);
 
-            itemRow.append(titleSpan, priceSpan);
-            receiptItems.appendChild(itemRow);
-        });
+                itemRow.append(titleSpan, priceSpan);
+                receiptItems.appendChild(itemRow);
+            });
+        }
+    } catch (err) {
+        console.error("Critical error in loadReceipt:", err);
     }
 }
 
-// ===================================
-// INITIALIZATION & EVENT LISTENERS
-// ===================================
-document.addEventListener("DOMContentLoaded", () => {
-    const btnPrint = document.getElementById("btnPrint");
-    const btnBack = document.getElementById("btnBack");
-
-    if (btnPrint) {
-        btnPrint.addEventListener("click", () => {
-            window.print();
-        });
-    }
-
-    if (btnBack) {
-        btnBack.addEventListener("click", () => {
-            window.location.href = "cashier.html";
-        });
-    }
-
-    loadReceipt();
-});
+// Automatic load when script runs
+loadReceipt();

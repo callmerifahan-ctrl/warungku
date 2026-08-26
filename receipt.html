@@ -15,6 +15,25 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="WarungKu">
     <link rel="apple-touch-icon" href="image/logo-warungku.png">
+    
+    <style>
+        /* CSS Tambahan Khusus Cetak agar Tombol Tidak Ikut Ter-print */
+        @media print {
+            .receipt-buttons, .main-nav, nav {
+                display: none !important;
+            }
+            body {
+                background: white;
+            }
+            .receipt-container {
+                box-shadow: none;
+                border: none;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="receipt-container">
@@ -44,8 +63,8 @@
         </div>
 
         <div class="receipt-buttons">
-            <button type="button" id="btnPrint" class="btn btn-primary">🖨️ Cetak / Simpan</button>
-            <button type="button" id="btnBack" class="btn btn-secondary">Kembali</button>
+            <button type="button" onclick="window.print()" class="btn btn-primary">🖨️ Cetak / Simpan</button>
+            <button type="button" onclick="window.location.href='cashier.html'" class="btn btn-secondary">Kembali</button>
         </div>
     </div>
 
