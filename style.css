@@ -1,6 +1,7 @@
 /* ===================================
    WARUNGKU DESIGN SYSTEM & VARIABLES
 =================================== */
+
 :root {
     /* Brand Colors */
     --primary: #D67A67;
@@ -53,6 +54,33 @@ body {
     padding: 24px;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow);
+}
+
+/* ==========================================
+   RESET & OPTIMASI KHUSUS IPHONE / IOS
+   ========================================== */
+* {
+    -webkit-tap-highlight-color: transparent; /* Hilangkan efek bayangan abu-abu saat tombol di-tap */
+    -webkit-text-size-adjust: 100%;           /* Cegah Safari memperbesar font otomatis */
+}
+
+/* Mengatur area aman (Safe Area) untuk Notch & Bar Navigasi Bawah iPhone */
+body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+}
+
+/* Mematikan styling bawaan tombol iOS agar konsisten dengan desain kita */
+input[type="text"],
+input[type="number"],
+select,
+textarea,
+button {
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 8px; /* Menyeragamkan sudut tombol/input */
 }
 
 /* ===================================
