@@ -137,7 +137,7 @@ function printLabel(item) {
             </style>
         </head>
         <body>
-            <div class="store">KLONTONGIN REMPAH</div>
+            <div class="store">Toko Ibu Irma</div>
             <div class="title">${item.nama_barang}</div>
             <div class="price">${formatRupiah(item.harga_jual)}</div>
             <svg id="barcode"></svg>
