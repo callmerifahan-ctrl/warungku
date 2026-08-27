@@ -45,15 +45,19 @@ function showToast(message) {
 // ===================================
 // LOAD & RENDER HISTORY
 // ===================================
+// ===================================
+// LOAD & RENDER HISTORY
+// ===================================
 async function loadHistory() {
     const transactionList = document.getElementById("transactionList");
     if (!transactionList) return;
 
     try {
+        // Menggunakan kolom 'tanggal' (bukan created_at)
         const { data, error } = await supabaseClient
             .from("transaksi")
             .select("*")
-            .order("created_at", { ascending: false });
+            .order("tanggal", { ascending: false });
 
         if (error) {
             console.error("Supabase Error Details:", error);
@@ -99,7 +103,6 @@ function renderHistory(transactions) {
         card.style.boxShadow = "0 2px 6px rgba(0,0,0,0.06)";
         card.style.cursor = "pointer";
 
-        // Buka detail struk saat kartu diklik
         card.addEventListener("click", () => {
             window.location.href = `receipt.html?id=${trx.kode_transaksi}`;
         });
@@ -125,7 +128,8 @@ function renderHistory(transactions) {
         dateText.style.margin = "6px 0 0 0";
         dateText.style.fontSize = "13px";
         dateText.style.color = "var(--text-muted)";
-        dateText.textContent = formatDate(trx.created_at);
+        // Menggunakan properti trx.tanggal
+        dateText.textContent = formatDate(trx.tanggal);
 
         card.append(headerDiv, dateText);
         transactionList.appendChild(card);
