@@ -27,6 +27,7 @@ const namaBarangInput = document.getElementById("namaBarang");
 const stokBarangInput = document.getElementById("stokBarang");
 const hargaBeliInput = document.getElementById("hargaBeli");
 const hargaJualInput = document.getElementById("hargaJual");
+const kategoriInput = document.getElementById("kategoriBarang"); // Dropdown / Input Kategori
 const btnSubmit = document.getElementById("btnSubmit");
 const btnCancel = document.getElementById("btnCancel");
 const itemList = document.getElementById("itemList");
@@ -62,8 +63,24 @@ function showToast(message) {
     }
 }
 
+// Helper untuk membuat kode otomatis: (Kategori 3 Huruf) - (ID/Nomor)
+function generateItemCode(item) {
+    if (item.barcode) return item.barcode;
+    
+    let prefix = "BRG";
+    if (item.kategori) {
+        prefix = item.kategori.substring(0, 3).toUpperCase();
+    } else if (item.nama_barang) {
+        // Fallback jika tidak ada kategori, ambil dari nama barang
+        prefix = item.nama_barang.substring(0, 3).toUpperCase();
+    }
+    
+    const paddedId = String(item.id || Date.now()).padStart(4, "0");
+    return `${prefix}-${paddedId}`;
+}
+
 // ===================================
-// PRINT LABEL STIKER (WITH BARCODE)
+// PRINT LABEL STIKER (WITH BARCODE & KODE CATEGORY)
 // ===================================
 function printLabel(item) {
     const printWindow = window.open('', '_blank', 'width=400,height=400');
@@ -72,8 +89,7 @@ function printLabel(item) {
         return;
     }
 
-    // Gunakan item.barcode jika ada, fallback ke item.id
-    const barcodeValue = item.barcode || String(item.id);
+    const itemCode = generateItemCode(item);
 
     printWindow.document.write(`
         <!DOCTYPE html>
@@ -129,7 +145,7 @@ function printLabel(item) {
             <script>
                 window.onload = function() {
                     try {
-                        JsBarcode("#barcode", "${barcodeValue}", {
+                        JsBarcode("#barcode", "${itemCode}", {
                             format: "CODE128",
                             lineColor: "#000",
                             width: 2,
@@ -200,7 +216,8 @@ function renderItems() {
     const keyword = searchInput ? searchInput.value.toLowerCase().trim() : "";
 
     const filtered = items.filter(item => 
-        (item.nama_barang || "").toLowerCase().includes(keyword)
+        (item.nama_barang || "").toLowerCase().includes(keyword) ||
+        (item.kategori || "").toLowerCase().includes(keyword)
     );
 
     if (filtered.length === 0) {
@@ -234,7 +251,7 @@ function createItemCard(item) {
     
     const title = document.createElement("h3");
     title.style.margin = "0 0 4px 0";
-    title.textContent = item.nama_barang;
+    title.textContent = `${item.nama_barang} [${generateItemCode(item)}]`;
 
     const stok = document.createElement("p");
     stok.style.margin = "0";
@@ -288,6 +305,7 @@ function populateForm(item) {
     stokBarangInput.value = item.stok;
     hargaBeliInput.value = item.harga_beli;
     hargaJualInput.value = item.harga_jual;
+    if (kategoriInput) kategoriInput.value = item.kategori || "";
 
     btnSubmit.textContent = "Simpan Perubahan";
     btnCancel.style.display = "inline-block";
@@ -317,6 +335,7 @@ async function handleSubmit(e) {
     const stok = parseInt(stokBarangInput.value, 10);
     const harga_beli = parseFloat(hargaBeliInput.value);
     const harga_jual = parseFloat(hargaJualInput.value);
+    const kategori = kategoriInput ? kategoriInput.value.trim() : "";
 
     let image_url = itemImageUrlInput.value;
 
@@ -326,7 +345,19 @@ async function handleSubmit(e) {
         if (uploadedUrl) image_url = uploadedUrl;
     }
 
-    const payload = { nama_barang, stok, harga_beli, harga_jual, image_url };
+    // Merakit payload termasuk barcode berformat kategori
+    const prefix = kategori ? kategori.substring(0, 3).toUpperCase() : nama_barang.substring(0, 3).toUpperCase();
+    const generatedBarcode = `${prefix}-${String(id || Date.now()).slice(-4)}`;
+
+    const payload = { 
+        nama_barang, 
+        stok, 
+        harga_beli, 
+        harga_jual, 
+        image_url,
+        kategori,
+        barcode: generatedBarcode
+    };
 
     if (id) {
         const { error } = await supabaseClient
