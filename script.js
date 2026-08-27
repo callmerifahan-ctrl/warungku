@@ -354,10 +354,19 @@ btnSubmitAddStock.addEventListener("click", async () => {
 // INITIALIZATION
 // ===================================
 function init() {
+    // Hapus Service Worker PWA lama agar HP selalu ambil versi terbaru
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+            for (let registration of registrations) {
+                registration.unregister();
+            }
+        });
+    }
+    
     itemForm.addEventListener("submit", handleSubmit);
     btnCancel.addEventListener("click", resetForm);
     if (searchInput) searchInput.addEventListener("input", renderItems);
-    
+
     loadItems();
 }
 
