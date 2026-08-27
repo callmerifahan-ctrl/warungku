@@ -143,7 +143,7 @@ function printLabel(item) {
             <svg id="barcode"></svg>
 
             <script>
-                window.onload = function() {
+                function doPrint() {
                     try {
                         JsBarcode("#barcode", "${itemCode}", {
                             format: "CODE128",
@@ -157,10 +157,19 @@ function printLabel(item) {
                     } catch (e) {
                         console.error("Gagal generate barcode:", e);
                     }
-                    setTimeout(() => {
-                        window.print();
-                        window.close();
-                    }, 300);
+
+                    // Tampilkan dialog print langsung
+                    window.print();
+                    
+                    // Tutup jendela otomatis setelah dialog print selesai/ditutup
+                    window.close();
+                }
+
+                // Jalankan fungsi cetak begitu seluruh dokumen & script JsBarcode selesai di-load
+                if (document.readyState === 'complete') {
+                    doPrint();
+                } else {
+                    window.onload = doPrint;
                 }
             <\/script>
         </body>
