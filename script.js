@@ -63,6 +63,80 @@ function showToast(message) {
 }
 
 // ===================================
+// PRINT LABEL STIKER (REMPAH-REMPAH)
+// ===================================
+function printLabel(item) {
+    const printWindow = window.open('', '_blank', 'width=400,height=400');
+    if (!printWindow) {
+        alert("Pop-up diblokir! Harap izinkan pop-up di browser Anda.");
+        return;
+    }
+
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Label - ${item.nama_barang}</title>
+            <style>
+                @page {
+                    size: 50mm 30mm;
+                    margin: 0;
+                }
+                body {
+                    font-family: Arial, sans-serif;
+                    margin: 0;
+                    padding: 4px;
+                    text-align: center;
+                    box-sizing: border-box;
+                }
+                .store {
+                    font-size: 8px;
+                    font-weight: bold;
+                    color: #555;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+                .title {
+                    font-size: 11px;
+                    font-weight: bold;
+                    margin: 2px 0;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+                .price {
+                    font-size: 15px;
+                    font-weight: bold;
+                    color: #000;
+                    margin: 2px 0;
+                }
+                .code {
+                    font-size: 8px;
+                    color: #666;
+                    border-top: 1px dashed #ccc;
+                    padding-top: 2px;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="store">KLONTONGIN REMPAH</div>
+            <div class="title">${item.nama_barang}</div>
+            <div class="price">${formatRupiah(item.harga_jual)}</div>
+            <div class="code">ID: ${item.id}</div>
+            <script>
+                window.onload = function() {
+                    window.print();
+                    setTimeout(() => window.close(), 500);
+                }
+            <\/script>
+        </body>
+        </html>
+    `);
+
+    printWindow.document.close();
+}
+
+// ===================================
 // DATABASE OPERATIONS
 // ===================================
 async function loadItems() {
@@ -103,6 +177,7 @@ async function uploadImageToSupabase(file) {
 // RENDERERS
 // ===================================
 function renderItems() {
+    if (!itemList) return;
     itemList.replaceChildren();
     const keyword = searchInput ? searchInput.value.toLowerCase().trim() : "";
 
@@ -159,7 +234,15 @@ function createItemCard(item) {
 
     const actionBox = document.createElement("div");
     actionBox.style.display = "flex";
-    actionBox.style.gap = "8px";
+    actionBox.style.gap = "6px";
+    actionBox.style.flexWrap = "wrap";
+
+    const btnLabel = document.createElement("button");
+    btnLabel.className = "btn";
+    btnLabel.style.background = "#27ae60";
+    btnLabel.style.color = "#fff";
+    btnLabel.textContent = "🏷️ Label";
+    btnLabel.addEventListener("click", () => printLabel(item));
 
     const btnEdit = document.createElement("button");
     btnEdit.className = "btn btn-secondary";
@@ -173,7 +256,7 @@ function createItemCard(item) {
     btnDelete.textContent = "🗑️ Hapus";
     btnDelete.addEventListener("click", () => deleteItem(item.id, item.nama_barang));
 
-    actionBox.append(btnEdit, btnDelete);
+    actionBox.append(btnLabel, btnEdit, btnDelete);
     card.append(infoBox, actionBox);
 
     return card;
@@ -197,7 +280,7 @@ function resetForm() {
     formTitle.textContent = "➕ Tambah Barang Baru";
     itemIdInput.value = "";
     itemImageUrlInput.value = "";
-    itemForm.reset();
+    if (itemForm) itemForm.reset();
 
     btnSubmit.textContent = "Simpan Barang";
     btnCancel.style.display = "none";
@@ -219,7 +302,6 @@ async function handleSubmit(e) {
 
     let image_url = itemImageUrlInput.value;
 
-    // Unggah gambar jika ada file foto baru
     if (currentUploadedFile) {
         showToast("Mengunggah gambar...");
         const uploadedUrl = await uploadImageToSupabase(currentUploadedFile);
@@ -229,7 +311,6 @@ async function handleSubmit(e) {
     const payload = { nama_barang, stok, harga_beli, harga_jual, image_url };
 
     if (id) {
-        // Update Barang
         const { error } = await supabaseClient
             .from("barang")
             .update(payload)
@@ -242,7 +323,6 @@ async function handleSubmit(e) {
         }
         showToast("Barang berhasil diperbarui!");
     } else {
-        // Tambah Barang Baru
         const { error } = await supabaseClient
             .from("barang")
             .insert([payload]);
@@ -278,83 +358,89 @@ async function deleteItem(id, name) {
 }
 
 // Handler Foto Kamera
-cameraInput.addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+if (cameraInput) {
+    cameraInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
 
-    currentUploadedFile = file;
-    const reader = new FileReader();
-    reader.onload = function(evt) {
-        modalImagePreview.src = evt.target.result;
-        existingProductForm.style.display = "none";
-        photoOptionModal.style.display = "flex";
-    };
-    reader.readAsDataURL(file);
-});
-
-// Modal Option 1: Tambah Barang Baru
-btnOptionNew.addEventListener("click", () => {
-    photoOptionModal.style.display = "none";
-    resetForm();
-    namaBarangInput.focus();
-});
-
-// Modal Option 2: Tambah ke Barang yang Sudah Ada
-btnOptionExisting.addEventListener("click", () => {
-    selectExistingItem.replaceChildren();
-    
-    if (items.length === 0) {
-        alert("Belum ada daftar barang!");
-        return;
-    }
-
-    items.forEach(item => {
-        const opt = document.createElement("option");
-        opt.value = item.id;
-        opt.textContent = `${item.nama_barang} (Stok Saat Ini: ${item.stok})`;
-        selectExistingItem.appendChild(opt);
+        currentUploadedFile = file;
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            modalImagePreview.src = evt.target.result;
+            existingProductForm.style.display = "none";
+            photoOptionModal.style.display = "flex";
+        };
+        reader.readAsDataURL(file);
     });
+}
 
-    existingProductForm.style.display = "block";
-});
+// Modal Options
+if (btnOptionNew) {
+    btnOptionNew.addEventListener("click", () => {
+        photoOptionModal.style.display = "none";
+        resetForm();
+        namaBarangInput.focus();
+    });
+}
 
-// Modal Cancel
-btnOptionCancel.addEventListener("click", () => {
-    photoOptionModal.style.display = "none";
-    currentUploadedFile = null;
-});
+if (btnOptionExisting) {
+    btnOptionExisting.addEventListener("click", () => {
+        selectExistingItem.replaceChildren();
+        
+        if (items.length === 0) {
+            alert("Belum ada daftar barang!");
+            return;
+        }
 
-// Submit Update Stok Barang Lama
-btnSubmitAddStock.addEventListener("click", async () => {
-    const selectedId = selectExistingItem.value;
-    const addQty = parseInt(addQtyInput.value, 10) || 0;
+        items.forEach(item => {
+            const opt = document.createElement("option");
+            opt.value = item.id;
+            opt.textContent = `${item.nama_barang} (Stok Saat Ini: ${item.stok})`;
+            selectExistingItem.appendChild(opt);
+        });
 
-    const targetItem = items.find(i => i.id == selectedId);
-    if (!targetItem) return;
+        existingProductForm.style.display = "block";
+    });
+}
 
-    const newStok = (targetItem.stok || 0) + addQty;
+if (btnOptionCancel) {
+    btnOptionCancel.addEventListener("click", () => {
+        photoOptionModal.style.display = "none";
+        currentUploadedFile = null;
+    });
+}
 
-    const { error } = await supabaseClient
-        .from("barang")
-        .update({ stok: newStok })
-        .eq("id", selectedId);
+if (btnSubmitAddStock) {
+    btnSubmitAddStock.addEventListener("click", async () => {
+        const selectedId = selectExistingItem.value;
+        const addQty = parseInt(addQtyInput.value, 10) || 0;
 
-    if (error) {
-        console.error(error);
-        showToast("Gagal menambah stok!");
-        return;
-    }
+        const targetItem = items.find(i => i.id == selectedId);
+        if (!targetItem) return;
 
-    showToast(`Stok ${targetItem.nama_barang} berhasil ditambahkan!`);
-    photoOptionModal.style.display = "none";
-    await loadItems();
-});
+        const newStok = (targetItem.stok || 0) + addQty;
+
+        const { error } = await supabaseClient
+            .from("barang")
+            .update({ stok: newStok })
+            .eq("id", selectedId);
+
+        if (error) {
+            console.error(error);
+            showToast("Gagal menambah stok!");
+            return;
+        }
+
+        showToast(`Stok ${targetItem.nama_barang} berhasil ditambahkan!`);
+        photoOptionModal.style.display = "none";
+        await loadItems();
+    });
+}
 
 // ===================================
 // INITIALIZATION
 // ===================================
 function init() {
-    // Hapus Service Worker PWA lama agar HP selalu ambil versi terbaru
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then(registrations => {
             for (let registration of registrations) {
@@ -362,9 +448,9 @@ function init() {
             }
         });
     }
-    
-    itemForm.addEventListener("submit", handleSubmit);
-    btnCancel.addEventListener("click", resetForm);
+
+    if (itemForm) itemForm.addEventListener("submit", handleSubmit);
+    if (btnCancel) btnCancel.addEventListener("click", resetForm);
     if (searchInput) searchInput.addEventListener("input", renderItems);
 
     loadItems();

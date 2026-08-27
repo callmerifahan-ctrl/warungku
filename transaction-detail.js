@@ -52,7 +52,7 @@ async function fetchTransactionFromSupabase(code) {
 
     return {
         transactionCode: data.kode_transaksi,
-        date: data.tanggal ? new Date(data.tanggal).toLocaleString("id-ID") : "-",
+        date: data.tanggal ? new Date(data.tanggal).toLocaleString("id-ID") : (data.created_at ? new Date(data.created_at).toLocaleString("id-ID") : "-"),
         items: data.item || [],
         total: data.total,
         payment: data.bayar,
@@ -119,7 +119,6 @@ function renderTransactionDetail(transaction) {
 async function init() {
     const { id, source } = getUrlParams();
 
-    // Navigasi Tombol Kembali
     const backButton = document.getElementById("backButton");
     if (backButton) {
         backButton.addEventListener("click", () => {
@@ -131,7 +130,6 @@ async function init() {
         });
     }
 
-    // Load Data Transaksi
     const transaction = await fetchTransactionFromSupabase(id);
     renderTransactionDetail(transaction);
 }

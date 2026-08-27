@@ -1,5 +1,5 @@
 /* ===================================
-   WARUNGKU DESIGN SYSTEM & VARIABLES
+   KLONTONGIN DESIGN SYSTEM & VARIABLES
 =================================== */
 :root {
     /* Brand Colors */
@@ -236,14 +236,6 @@ button:hover, .btn:hover {
     margin: 0;
 }
 
-.dashboard-detail {
-    display: none;
-    background: var(--surface-soft);
-    margin-top: 20px;
-    padding: 16px;
-    border-radius: var(--radius-md);
-}
-
 /* ===================================
    FORM & SORT BOX (INVENTORY)
 =================================== */
@@ -315,6 +307,7 @@ button:hover, .btn:hover {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    box-shadow: 0 3px 10px rgba(0,0,0,.04);
 }
 
 .cashier-card h3 {
@@ -355,6 +348,7 @@ button:hover, .btn:hover {
     padding: 12px;
     background: var(--surface-soft);
     border-radius: var(--radius-sm);
+    box-shadow: 0 2px 8px rgba(0,0,0,.04);
 }
 
 .cart-summary, .change-group {
@@ -543,6 +537,29 @@ button:hover, .btn:hover {
     overflow: hidden;
 }
 
+/* TOAST NOTIFICATION */
+.toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #333;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 2000;
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
 /* ===================================
    MEDIA PRINT (CETAK STRUK & BARCODE)
 =================================== */
@@ -572,18 +589,6 @@ button:hover, .btn:hover {
 
     .receipt-buttons, .main-nav {
         display: none !important;
-    }
-
-    #barcodeLabelPrintArea, #barcodeLabelPrintArea * {
-        visibility: visible;
-    }
-
-    #barcodeLabelPrintArea {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        box-shadow: none;
     }
 }
 

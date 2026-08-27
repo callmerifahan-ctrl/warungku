@@ -66,7 +66,7 @@ async function loadReceipt() {
         }
 
         if (receiptCode) receiptCode.textContent = data.kode_transaksi;
-        if (receiptDate) receiptDate.textContent = formatDate(data.created_at);
+        if (receiptDate) receiptDate.textContent = formatDate(data.tanggal || data.created_at);
         if (receiptTotal) receiptTotal.textContent = formatRupiah(data.total);
         if (receiptPayment) receiptPayment.textContent = formatRupiah(data.bayar);
         if (receiptChange) receiptChange.textContent = formatRupiah(data.kembalian);
@@ -95,5 +95,4 @@ async function loadReceipt() {
     }
 }
 
-// Automatic load when script runs
 loadReceipt();

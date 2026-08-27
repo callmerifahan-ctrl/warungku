@@ -4,7 +4,6 @@
 const SUPABASE_URL = "https://dyyzsuleugpgiqutebwv.supabase.co";
 const SUPABASE_KEY = "sb_publishable_hKWVFsDZC539-T3nVyS13g_ME3HC0AP";
 
-// Tambahkan opsi auth ini agar Supabase tidak menyentuh Storage browser
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
     auth: {
         persistSession: false,
@@ -66,7 +65,7 @@ async function loadDataSupabase() {
 
     items = (data || []).map(item => ({
         id: item.id,
-        name: item.nama,
+        name: item.nama_barang || item.nama,
         stock: item.stok,
         sellPrice: item.harga_jual,
         code: item.barcode
@@ -174,7 +173,6 @@ async function checkout() {
     checkoutButton.disabled = true;
     checkoutButton.textContent = "Memproses...";
 
-    // Validasi ulang stok sebelum proses pemotongan
     for (const cartItem of cart) {
         const item = getItemById(cartItem.id);
         if (!item || item.stock < cartItem.qty) {
@@ -185,7 +183,6 @@ async function checkout() {
         }
     }
 
-    // 1. Potong Stok di Supabase
     for (const cartItem of cart) {
         const item = getItemById(cartItem.id);
         const newStock = item.stock - cartItem.qty;
@@ -204,14 +201,14 @@ async function checkout() {
         }
     }
 
-    // 2. Simpan Transaksi
     const transactionCode = await generateTransactionCode();
     const newTransaction = {
         kode_transaksi: transactionCode,
         item: cart,
         total,
         bayar: payment,
-        kembalian: change
+        kembalian: change,
+        tanggal: new Date().toISOString()
     };
 
     const { error: transactionError } = await supabaseClient
@@ -313,7 +310,6 @@ function openScanner() {
     scannerModal.classList.add("show");
     html5QrCode = new Html5Qrcode("scannerReader");
     
-    // Konfigurasi bingkai memanjang khusus Barcode Garis (1D)
     const config = { 
         fps: 10, 
         qrbox: { width: 260, height: 130 } 

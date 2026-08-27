@@ -45,15 +45,11 @@ function showToast(message) {
 // ===================================
 // LOAD & RENDER HISTORY
 // ===================================
-// ===================================
-// LOAD & RENDER HISTORY
-// ===================================
 async function loadHistory() {
     const transactionList = document.getElementById("transactionList");
     if (!transactionList) return;
 
     try {
-        // Menggunakan kolom 'tanggal' (bukan created_at)
         const { data, error } = await supabaseClient
             .from("transaksi")
             .select("*")
@@ -128,8 +124,7 @@ function renderHistory(transactions) {
         dateText.style.margin = "6px 0 0 0";
         dateText.style.fontSize = "13px";
         dateText.style.color = "var(--text-muted)";
-        // Menggunakan properti trx.tanggal
-        dateText.textContent = formatDate(trx.tanggal);
+        dateText.textContent = formatDate(trx.tanggal || trx.created_at);
 
         card.append(headerDiv, dateText);
         transactionList.appendChild(card);
@@ -140,7 +135,6 @@ function renderHistory(transactions) {
 // INITIALIZATION
 // ===================================
 function init() {
-    // Unregister PWA Service Worker lama
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then(registrations => {
             for (let registration of registrations) {

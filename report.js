@@ -32,7 +32,6 @@ function formatRupiah(angka) {
 // LOAD & CALCULATE REPORT
 // ===================================
 async function loadReportData() {
-    // 1. Fetch data barang untuk modal/keuntungan
     const { data: barangData, error: errBarang } = await supabaseClient
         .from("barang")
         .select("*");
@@ -48,7 +47,6 @@ async function loadReportData() {
         barangMap[b.id] = b;
     });
 
-    // 2. Fetch data transaksi
     const { data: trxData, error: errTrx } = await supabaseClient
         .from("transaksi")
         .select("*");
@@ -86,30 +84,30 @@ async function loadReportData() {
         });
     });
 
-    // Render summary
-    reportOmzet.textContent = formatRupiah(totalOmzet);
-    reportKeuntungan.textContent = formatRupiah(totalKeuntungan);
-    reportTotalTransaksi.textContent = transactions.length;
-    reportTerjual.textContent = totalItemTerjual;
+    if (reportOmzet) reportOmzet.textContent = formatRupiah(totalOmzet);
+    if (reportKeuntungan) reportKeuntungan.textContent = formatRupiah(totalKeuntungan);
+    if (reportTotalTransaksi) reportTotalTransaksi.textContent = transactions.length;
+    if (reportTerjual) reportTerjual.textContent = totalItemTerjual;
 
-    // Render top products
-    topProductsList.replaceChildren();
-    const sortedProducts = Object.entries(productSales)
-        .sort((a, b) => b[1] - a[1]);
+    if (topProductsList) {
+        topProductsList.replaceChildren();
+        const sortedProducts = Object.entries(productSales)
+            .sort((a, b) => b[1] - a[1]);
 
-    if (sortedProducts.length === 0) {
-        const li = document.createElement("li");
-        li.textContent = "Belum ada penjualan.";
-        topProductsList.appendChild(li);
-        return;
+        if (sortedProducts.length === 0) {
+            const li = document.createElement("li");
+            li.textContent = "Belum ada penjualan.";
+            topProductsList.appendChild(li);
+            return;
+        }
+
+        sortedProducts.forEach(([name, qty]) => {
+            const li = document.createElement("li");
+            li.style.margin = "8px 0";
+            li.innerHTML = `<strong>${name}</strong>: ${qty} pcs terjual`;
+            topProductsList.appendChild(li);
+        });
     }
-
-    sortedProducts.forEach(([name, qty]) => {
-        const li = document.createElement("li");
-        li.style.margin = "8px 0";
-        li.innerHTML = `<strong>${name}</strong>: ${qty} pcs terjual`;
-        topProductsList.appendChild(li);
-    });
 }
 
 loadReportData();
