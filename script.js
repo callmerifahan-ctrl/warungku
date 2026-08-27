@@ -63,7 +63,7 @@ function showToast(message) {
 }
 
 // ===================================
-// PRINT LABEL STIKER (REMPAH-REMPAH)
+// PRINT LABEL STIKER (WITH BARCODE)
 // ===================================
 function printLabel(item) {
     const printWindow = window.open('', '_blank', 'width=400,height=400');
@@ -72,11 +72,15 @@ function printLabel(item) {
         return;
     }
 
+    // Gunakan item.barcode jika ada, fallback ke item.id
+    const barcodeValue = item.barcode || String(item.id);
+
     printWindow.document.write(`
         <!DOCTYPE html>
         <html>
         <head>
             <title>Label - ${item.nama_barang}</title>
+            <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"><\/script>
             <style>
                 @page {
                     size: 50mm 30mm;
@@ -94,27 +98,25 @@ function printLabel(item) {
                     font-weight: bold;
                     color: #555;
                     text-transform: uppercase;
-                    letter-spacing: 0.5px;
                 }
                 .title {
-                    font-size: 11px;
+                    font-size: 10px;
                     font-weight: bold;
-                    margin: 2px 0;
+                    margin: 1px 0;
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
                 }
                 .price {
-                    font-size: 15px;
+                    font-size: 13px;
                     font-weight: bold;
                     color: #000;
-                    margin: 2px 0;
+                    margin: 1px 0;
                 }
-                .code {
-                    font-size: 8px;
-                    color: #666;
-                    border-top: 1px dashed #ccc;
-                    padding-top: 2px;
+                #barcode {
+                    width: 90%;
+                    height: 35px;
+                    margin-top: 2px;
                 }
             </style>
         </head>
@@ -122,11 +124,27 @@ function printLabel(item) {
             <div class="store">KLONTONGIN REMPAH</div>
             <div class="title">${item.nama_barang}</div>
             <div class="price">${formatRupiah(item.harga_jual)}</div>
-            <div class="code">ID: ${item.id}</div>
+            <svg id="barcode"></svg>
+
             <script>
                 window.onload = function() {
-                    window.print();
-                    setTimeout(() => window.close(), 500);
+                    try {
+                        JsBarcode("#barcode", "${barcodeValue}", {
+                            format: "CODE128",
+                            lineColor: "#000",
+                            width: 2,
+                            height: 35,
+                            displayValue: true,
+                            fontSize: 10,
+                            margin: 0
+                        });
+                    } catch (e) {
+                        console.error("Gagal generate barcode:", e);
+                    }
+                    setTimeout(() => {
+                        window.print();
+                        window.close();
+                    }, 300);
                 }
             <\/script>
         </body>
