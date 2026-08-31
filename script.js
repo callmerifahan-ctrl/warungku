@@ -89,7 +89,6 @@ async function processOCR(file) {
     statusOCR.innerText = '⏳ Memulai pemrosesan gambar...';
 
     try {
-        // Cek apakah Tesseract.js sudah dimuat di window
         if (typeof Tesseract === 'undefined') {
             throw new Error('Library Tesseract.js belum terkonfigurasi di index.html');
         }
@@ -107,17 +106,14 @@ async function processOCR(file) {
             }
         );
 
-        // Ambil teks dan bersihkan karakter khusus yang tidak perlu
         let rawText = result.data.text || "";
         
-        // Pisahkan per baris dan ambil kalimat yang berisi kata yang sah (mengabaikan baris kosong)
         let lines = rawText
             .split('\n')
             .map(line => line.replace(/[^a-zA-Z0-9\s]/g, '').trim())
             .filter(line => line.length > 2);
 
         if (lines.length > 0) {
-            // Ambil maksimal 2 baris teratas (biasanya Nama Merk + Varian Produk)
             let predictedName = lines.slice(0, 2).join(' ');
             
             if (namaBarangInput) {
@@ -469,13 +465,15 @@ async function deleteItem(id, name) {
     await loadItems();
 }
 
-// Handler Foto Kamera
+// Handler Foto Kamera (Langsung Panggil OCR Otomatis)
 if (cameraInput) {
     cameraInput.addEventListener("change", (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
         currentUploadedFile = file;
+
+        // 1. Tampilkan Preview Modal
         const reader = new FileReader();
         reader.onload = function(evt) {
             modalImagePreview.src = evt.target.result;
@@ -483,6 +481,9 @@ if (cameraInput) {
             photoOptionModal.style.display = "flex";
         };
         reader.readAsDataURL(file);
+
+        // 2. LANGSUNG EKSEKUSI OCR DI BACKGROUND
+        processOCR(file);
     });
 }
 
@@ -490,13 +491,9 @@ if (cameraInput) {
 if (btnOptionNew) {
     btnOptionNew.addEventListener("click", () => {
         photoOptionModal.style.display = "none";
-        resetForm();
         
-        if (currentUploadedFile) {
-            processOCR(currentUploadedFile);
-        }
-        
-        namaBarangInput.focus();
+        // Fokuskan ke nama barang & scroll halus ke form
+        if (namaBarangInput) namaBarangInput.focus();
         window.scrollTo({ top: 0, behavior: "smooth" });
     });
 }
@@ -525,6 +522,7 @@ if (btnOptionCancel) {
     btnOptionCancel.addEventListener("click", () => {
         photoOptionModal.style.display = "none";
         currentUploadedFile = null;
+        if (statusOCR) statusOCR.style.display = "none";
     });
 }
 
