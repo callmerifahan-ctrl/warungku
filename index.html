@@ -15,6 +15,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="KlontongIn">
     <link rel="apple-touch-icon" href="image/logo-warungku.png">
+
+    <!-- Library OCR Gratisan Tesseract.js -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -37,6 +40,7 @@
                 📷 Ambil Foto / Scan Barang
             </label>
             <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;">
+            <small id="statusOCR" style="display: none; margin-top: 8px; font-weight: bold; font-size: 13px;"></small>
         </div>
 
         <!-- Form Tambah / Edit Barang -->
@@ -94,7 +98,7 @@
                 <img id="modalImagePreview" src="" alt="Preview" style="max-width: 100%; max-height: 150px; border-radius: 8px;">
             </div>
 
-            <button id="btnOptionNew" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">➕ Tambah Barang Baru</button>
+            <button id="btnOptionNew" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">➕ Tambah Barang Baru (Auto OCR)</button>
             <button id="btnOptionExisting" class="btn btn-secondary" style="width: 100%; margin-bottom: 10px;">📦 Tambah ke Barang yang Sudah Ada</button>
             <button id="btnOptionCancel" class="btn" style="width: 100%; background: #ccc;">Batal</button>
 

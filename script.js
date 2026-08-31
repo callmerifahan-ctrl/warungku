@@ -33,8 +33,9 @@ const btnCancel = document.getElementById("btnCancel");
 const itemList = document.getElementById("itemList");
 const searchInput = document.getElementById("searchInput");
 
-// Modal Elements
+// Modal & OCR Elements
 const cameraInput = document.getElementById("cameraInput");
+const statusOCR = document.getElementById("statusOCR");
 const photoOptionModal = document.getElementById("photoOptionModal");
 const modalImagePreview = document.getElementById("modalImagePreview");
 const btnOptionNew = document.getElementById("btnOptionNew");
@@ -71,12 +72,58 @@ function generateItemCode(item) {
     if (item.kategori) {
         prefix = item.kategori.substring(0, 3).toUpperCase();
     } else if (item.nama_barang) {
-        // Fallback jika tidak ada kategori, ambil dari nama barang
         prefix = item.nama_barang.substring(0, 3).toUpperCase();
     }
     
     const paddedId = String(item.id || Date.now()).padStart(4, "0");
     return `${prefix}-${paddedId}`;
+}
+
+// ===================================
+// OCR PROCESSOR (TESSERACT.JS)
+// ===================================
+async function processOCR(file) {
+    if (!statusOCR) return;
+
+    statusOCR.style.display = 'block';
+    statusOCR.style.color = '#333';
+    statusOCR.innerText = '⏳ Memulai pembacaan teks kemasan...';
+
+    try {
+        const result = await Tesseract.recognize(
+            file,
+            'ind+eng',
+            {
+                logger: m => {
+                    if (m.status === 'recognizing text') {
+                        const persen = Math.round(m.progress * 100);
+                        statusOCR.innerText = `⏳ Membaca teks kemasan: ${persen}%`;
+                    }
+                }
+            }
+        );
+
+        let teksHasil = result.data.text;
+        let barisTeks = teksHasil
+            .split('\n')
+            .map(b => b.trim())
+            .filter(b => b.length > 2);
+
+        if (barisTeks.length > 0) {
+            let namaPrediksi = barisTeks.slice(0, 2).join(' ');
+            namaBarangInput.value = namaPrediksi;
+
+            statusOCR.style.color = 'green';
+            statusOCR.innerText = `✅ Nama terdeteksi: "${namaPrediksi}". Silakan lengkapi Stok & Harga.`;
+        } else {
+            statusOCR.style.color = 'orange';
+            statusOCR.innerText = '⚠️ Teks tidak terbaca jelas. Silakan isi nama barang secara manual.';
+        }
+    } catch (error) {
+        console.error('Error OCR:', error);
+        statusOCR.style.color = 'red';
+        statusOCR.innerText = '❌ Gagal membaca foto. Silakan ketik nama barang secara manual.';
+    }
 }
 
 // ===================================
@@ -158,14 +205,10 @@ function printLabel(item) {
                         console.error("Gagal generate barcode:", e);
                     }
 
-                    // Tampilkan dialog print langsung
                     window.print();
-                    
-                    // Tutup jendela otomatis setelah dialog print selesai/ditutup
                     window.close();
                 }
 
-                // Jalankan fungsi cetak begitu seluruh dokumen & script JsBarcode selesai di-load
                 if (document.readyState === 'complete') {
                     doPrint();
                 } else {
@@ -331,6 +374,7 @@ function resetForm() {
     btnCancel.style.display = "none";
     currentUploadedFile = null;
     currentUploadedUrl = "";
+    if (statusOCR) statusOCR.style.display = "none";
 }
 
 // ===================================
@@ -354,7 +398,6 @@ async function handleSubmit(e) {
         if (uploadedUrl) image_url = uploadedUrl;
     }
 
-    // Merakit payload termasuk barcode berformat kategori
     const prefix = kategori ? kategori.substring(0, 3).toUpperCase() : nama_barang.substring(0, 3).toUpperCase();
     const generatedBarcode = `${prefix}-${String(id || Date.now()).slice(-4)}`;
 
@@ -437,7 +480,14 @@ if (btnOptionNew) {
     btnOptionNew.addEventListener("click", () => {
         photoOptionModal.style.display = "none";
         resetForm();
+        
+        // Jalankan OCR Otomatis saat menambah barang baru dari foto
+        if (currentUploadedFile) {
+            processOCR(currentUploadedFile);
+        }
+        
         namaBarangInput.focus();
+        window.scrollTo({ top: 0, behavior: "smooth" });
     });
 }
 
