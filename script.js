@@ -27,7 +27,7 @@ const namaBarangInput = document.getElementById("namaBarang");
 const stokBarangInput = document.getElementById("stokBarang");
 const hargaBeliInput = document.getElementById("hargaBeli");
 const hargaJualInput = document.getElementById("hargaJual");
-const kategoriInput = document.getElementById("kategoriBarang"); // Dropdown / Input Kategori
+const kategoriInput = document.getElementById("kategoriBarang");
 const btnSubmit = document.getElementById("btnSubmit");
 const btnCancel = document.getElementById("btnCancel");
 const itemList = document.getElementById("itemList");
@@ -64,7 +64,6 @@ function showToast(message) {
     }
 }
 
-// Helper untuk membuat kode otomatis: (Kategori 3 Huruf) - (ID/Nomor)
 function generateItemCode(item) {
     if (item.barcode) return item.barcode;
     
@@ -87,9 +86,14 @@ async function processOCR(file) {
 
     statusOCR.style.display = 'block';
     statusOCR.style.color = '#333';
-    statusOCR.innerText = '⏳ Memulai pembacaan teks kemasan...';
+    statusOCR.innerText = '⏳ Memulai pemrosesan gambar...';
 
     try {
+        // Cek apakah Tesseract.js sudah dimuat di window
+        if (typeof Tesseract === 'undefined') {
+            throw new Error('Library Tesseract.js belum terkonfigurasi di index.html');
+        }
+
         const result = await Tesseract.recognize(
             file,
             'ind+eng',
@@ -103,31 +107,38 @@ async function processOCR(file) {
             }
         );
 
-        let teksHasil = result.data.text;
-        let barisTeks = teksHasil
+        // Ambil teks dan bersihkan karakter khusus yang tidak perlu
+        let rawText = result.data.text || "";
+        
+        // Pisahkan per baris dan ambil kalimat yang berisi kata yang sah (mengabaikan baris kosong)
+        let lines = rawText
             .split('\n')
-            .map(b => b.trim())
-            .filter(b => b.length > 2);
+            .map(line => line.replace(/[^a-zA-Z0-9\s]/g, '').trim())
+            .filter(line => line.length > 2);
 
-        if (barisTeks.length > 0) {
-            let namaPrediksi = barisTeks.slice(0, 2).join(' ');
-            namaBarangInput.value = namaPrediksi;
+        if (lines.length > 0) {
+            // Ambil maksimal 2 baris teratas (biasanya Nama Merk + Varian Produk)
+            let predictedName = lines.slice(0, 2).join(' ');
+            
+            if (namaBarangInput) {
+                namaBarangInput.value = predictedName;
+            }
 
             statusOCR.style.color = 'green';
-            statusOCR.innerText = `✅ Nama terdeteksi: "${namaPrediksi}". Silakan lengkapi Stok & Harga.`;
+            statusOCR.innerText = `✅ Teks terdeteksi: "${predictedName}". Silakan rapikan jika perlu.`;
         } else {
             statusOCR.style.color = 'orange';
-            statusOCR.innerText = '⚠️ Teks tidak terbaca jelas. Silakan isi nama barang secara manual.';
+            statusOCR.innerText = '⚠️ Teks tidak terdeteksi. Silakan ketik nama barang secara manual.';
         }
     } catch (error) {
         console.error('Error OCR:', error);
         statusOCR.style.color = 'red';
-        statusOCR.innerText = '❌ Gagal membaca foto. Silakan ketik nama barang secara manual.';
+        statusOCR.innerText = '❌ Gagal membaca foto. Pastikan dibuka via Live Server atau Web Hosting.';
     }
 }
 
 // ===================================
-// PRINT LABEL STIKER (WITH BARCODE & KODE CATEGORY)
+// PRINT LABEL STIKER (WITH BARCODE)
 // ===================================
 function printLabel(item) {
     const printWindow = window.open('', '_blank', 'width=400,height=400');
@@ -481,7 +492,6 @@ if (btnOptionNew) {
         photoOptionModal.style.display = "none";
         resetForm();
         
-        // Jalankan OCR Otomatis saat menambah barang baru dari foto
         if (currentUploadedFile) {
             processOCR(currentUploadedFile);
         }
